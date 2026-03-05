@@ -33,7 +33,7 @@ const DISCIPLINES: { value: Discipline; glyph: string }[] = [
 
 function SectionDivider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 my-5">
+    <div className="flex items-center gap-3 my-3">
       <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
       <span
         className="font-display uppercase"
@@ -58,8 +58,8 @@ function SliderRow({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="mb-5">
-      <div className="flex justify-between items-baseline mb-3">
+    <div className="mb-3">
+      <div className="flex justify-between items-baseline mb-2">
         <span
           className="font-display uppercase"
           style={{ fontSize: 9, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}
@@ -485,7 +485,7 @@ export default function Onboarding() {
           </div>
 
           {/* OR divider */}
-          <div className="flex items-center gap-3 my-5">
+          <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
             <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.22em', color: 'var(--fq-text-muted)' }}>or</span>
             <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
