@@ -2,14 +2,15 @@
 
 ## Overview
 
-FocusQuest is a fantasy-themed focus/productivity app built as a mobile-first web application. Users create an RPG-style character, choose a discipline (Scholar, Warrior, Scribe, Adventurer), and earn XP by completing real-world timed focus sessions tied to skills. The app features a Moonlight + Gold dark design system with a rich atmospheric UI.
+FocusQuest is a fantasy-themed focus/productivity app built as a mobile-first web application. Users create an RPG-style character, choose up to 3 disciplines from 8 options, and earn XP by completing real-world timed focus sessions. The app features a Moonlight + Gold dark design system with a rich atmospheric UI.
 
 **Core features:**
-- Multi-step onboarding flow to create a character with name, bearing, and discipline
+- Multi-step onboarding flow: splash → philosophy → identity → avatar → discipline selection → quest summary
+- Discipline system: 8 disciplines (scholar, warrior, scribe, adventurer, ranger, alchemist, bard, monk) — user picks 1–3 during onboarding; multi-select with max 3 enforced
 - Focus session timer with pause/resume, optional target duration, and XP rewards
-- Skill tree system organized by category (mind, body, creative, social, outdoors)
-- Session history with stats (streak, total focus time, monthly sessions)
-- Profile page with per-skill level progression
+- Disciplines tab showing per-discipline level progression with glyph, XP bar, and total time
+- Session history with stats (streak, total focus time, monthly sessions) and calendar heatmap
+- Profile page with all selected discipline badges, overall level, and stats
 
 The app is designed to fit a 430px-wide mobile viewport. It is a dark-only app — no light mode.
 

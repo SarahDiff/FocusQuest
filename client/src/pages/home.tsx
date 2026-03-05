@@ -4,12 +4,10 @@ import { ChevronRight, X } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
 import {
   getSkillLevel, getSkillXPProgress, getTimeOfDayGreeting,
-  formatDuration, SKILLS_LIBRARY, DISCIPLINE_META,
-  type UserSkill,
+  formatDuration, DISCIPLINE_META,
 } from "@/lib/fq-data";
 import XPBar from "@/components/xp-bar";
 import CharacterAvatar from "@/components/character-avatar";
-import SkillIcon from "@/components/skill-icon";
 
 function SessionSheet({ onClose }: { onClose: () => void }) {
   const { state, startSession } = useFQ();
@@ -17,7 +15,7 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [targetMin, setTargetMin] = useState<number | null>(null);
 
-  const activeSkills = state.userSkills.filter(s => s.isActive);
+  const { userDisciplines } = state;
 
   function handleBegin() {
     if (!selected) return;
@@ -50,19 +48,17 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
           overflowY: 'auto',
         }}
       >
-        {/* Handle */}
         <div className="flex justify-center pt-4 pb-2">
           <div className="rounded-full" style={{ width: 36, height: 3, background: 'var(--fq-border-mid)' }} />
         </div>
 
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--fq-border)' }}>
           <div>
             <p className="font-display uppercase" style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.85 }}>
               Begin Session
             </p>
             <h3 className="font-display font-semibold" style={{ fontSize: 18, color: 'var(--fq-text-primary)' }}>
-              Choose Your Skill
+              Choose Your Discipline
             </h3>
           </div>
           <button onClick={onClose} className="cursor-pointer" style={{ background: 'none', border: 'none', color: 'var(--fq-text-muted)' }}>
@@ -70,24 +66,23 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* Skills */}
         <div className="px-6 py-4">
-          {activeSkills.length === 0 ? (
+          {userDisciplines.length === 0 ? (
             <p className="font-serif italic text-center py-8" style={{ color: 'var(--fq-text-muted)', fontSize: 15 }}>
-              Add skills in the Skills tab first.
+              Complete onboarding to choose a discipline.
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {activeSkills.map(us => {
-                const def = SKILLS_LIBRARY.find(s => s.id === us.skillId);
-                if (!def) return null;
-                const sel = selected === us.skillId;
+              {userDisciplines.map(ud => {
+                const meta = DISCIPLINE_META[ud.disciplineId];
+                const sel = selected === ud.disciplineId;
+                const level = getSkillLevel(ud.totalMinutes);
                 return (
                   <button
-                    key={us.skillId}
-                    onClick={() => setSelected(us.skillId)}
+                    key={ud.disciplineId}
+                    onClick={() => setSelected(ud.disciplineId)}
                     className="flex items-center gap-4 w-full text-left cursor-pointer transition-all duration-200 rounded-2xl"
-                    data-testid={`skill-select-${us.skillId}`}
+                    data-testid={`discipline-select-${ud.disciplineId}`}
                     style={{
                       background: sel ? 'rgba(94,196,192,0.1)' : 'rgba(255,255,255,0.03)',
                       border: `1px solid ${sel ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
@@ -98,25 +93,23 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
                   >
                     <div
                       className="flex items-center justify-center rounded-lg flex-shrink-0"
-                      style={{
-                        width: 40, height: 40,
-                        background: sel ? 'rgba(94,196,192,0.12)' : 'rgba(255,255,255,0.04)',
-                        border: '1px solid var(--fq-border)',
-                      }}
+                      style={{ width: 40, height: 40, background: sel ? 'rgba(94,196,192,0.12)' : 'rgba(255,255,255,0.04)', border: '1px solid var(--fq-border)' }}
                     >
-                      <SkillIcon iconName={def.icon} size={18} style={{ color: sel ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }} />
+                      <span className="font-display text-lg" style={{ color: sel ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}>
+                        {meta.glyph}
+                      </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="font-display font-medium truncate" style={{ fontSize: 13, color: sel ? 'var(--fq-text-primary)' : 'var(--fq-text-body)', letterSpacing: '0.04em' }}>
-                          {def.name}
+                          {meta.label}
                         </span>
                         <span className="font-display" style={{ fontSize: 9, color: 'var(--fq-teal)', letterSpacing: '0.06em' }}>
-                          LVL {getSkillLevel(us.totalMinutes)}
+                          LVL {level}
                         </span>
                       </div>
-                      <p className="font-serif italic truncate" style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}>
-                        {def.description}
+                      <p className="font-display uppercase truncate" style={{ fontSize: 8, letterSpacing: '0.12em', color: 'var(--fq-text-muted)' }}>
+                        {meta.tagline}
                       </p>
                     </div>
                     {sel && <ChevronRight size={16} style={{ color: 'var(--fq-teal)', flexShrink: 0 }} />}
@@ -127,7 +120,6 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        {/* Duration */}
         {selected && (
           <div className="px-6 pb-4">
             <p className="font-display uppercase mb-3" style={{ fontSize: 9, letterSpacing: '0.22em', color: 'var(--fq-text-muted)' }}>
@@ -155,7 +147,6 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
           </div>
         )}
 
-        {/* Begin button */}
         <div className="px-6 pb-8">
           <button
             onClick={handleBegin}
@@ -200,33 +191,22 @@ function WeekRow() {
 
   return (
     <div className="flex items-center justify-between">
-      {days.map(({ d, hasSessions, isToday, label }, i) => (
+      {days.map(({ hasSessions, isToday, label }, i) => (
         <div key={i} className="flex flex-col items-center gap-2">
-          <span
-            className="font-display uppercase"
-            style={{ fontSize: 8, letterSpacing: '0.1em', color: isToday ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}
-          >
+          <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.1em', color: isToday ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}>
             {label}
           </span>
           <div
             className="rounded-full"
             style={{
               width: 28, height: 28,
-              background: hasSessions
-                ? 'rgba(94,196,192,0.15)'
-                : 'rgba(255,255,255,0.03)',
-              border: isToday
-                ? '1.5px solid var(--fq-teal)'
-                : hasSessions
-                  ? '1px solid rgba(94,196,192,0.3)'
-                  : '1px solid var(--fq-border)',
+              background: hasSessions ? 'rgba(94,196,192,0.15)' : 'rgba(255,255,255,0.03)',
+              border: isToday ? '1.5px solid var(--fq-teal)' : hasSessions ? '1px solid rgba(94,196,192,0.3)' : '1px solid var(--fq-border)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: isToday ? '0 0 8px rgba(94,196,192,0.3)' : 'none',
             }}
           >
-            {hasSessions && (
-              <div className="rounded-full" style={{ width: 6, height: 6, background: 'var(--fq-teal)' }} />
-            )}
+            {hasSessions && <div className="rounded-full" style={{ width: 6, height: 6, background: 'var(--fq-teal)' }} />}
           </div>
         </div>
       ))}
@@ -239,16 +219,15 @@ export default function Home() {
   const [showSheet, setShowSheet] = useState(false);
 
   const char = state.character;
-  const activeSkills = state.userSkills.filter(s => s.isActive);
-  const totalMinutes = state.userSkills.reduce((sum, s) => sum + s.totalMinutes, 0);
+  const totalMinutes = state.userDisciplines.reduce((sum, d) => sum + d.totalMinutes, 0);
   const overallLevel = getSkillLevel(totalMinutes);
   const overallProgress = getSkillXPProgress(totalMinutes);
-  const disciplineMeta = char ? DISCIPLINE_META[char.discipline] : null;
   const greeting = getTimeOfDayGreeting();
+
+  const primaryDisciplineMeta = char?.disciplines?.[0] ? DISCIPLINE_META[char.disciplines[0]] : null;
 
   return (
     <div className="px-5 pt-10 pb-4">
-      {/* Greeting */}
       <div className="mb-6 animate-fade-in">
         <p className="font-display uppercase" style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.8 }}>
           {greeting}
@@ -261,47 +240,31 @@ export default function Home() {
       {/* Character Card */}
       <div
         className="rounded-2xl mb-5 relative overflow-hidden animate-fade-in"
-        style={{
-          background: 'linear-gradient(145deg, rgba(14,20,32,0.95) 0%, rgba(8,13,22,0.98) 100%)',
-          border: '1px solid var(--fq-border-mid)',
-          boxShadow: 'var(--fq-shadow-card)',
-        }}
+        style={{ background: 'linear-gradient(145deg, rgba(14,20,32,0.95) 0%, rgba(8,13,22,0.98) 100%)', border: '1px solid var(--fq-border-mid)', boxShadow: 'var(--fq-shadow-card)' }}
       >
-        {/* Teal top line */}
-        <div
-          className="absolute top-0 left-0 right-0"
-          style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(94,196,192,0.35) 50%, transparent)' }}
-        />
-        {/* Corner glow */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: -40, right: -40, width: 120, height: 120,
-            background: 'radial-gradient(circle, rgba(94,196,192,0.06) 0%, transparent 70%)',
-          }}
-        />
+        <div className="absolute top-0 left-0 right-0" style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(94,196,192,0.35) 50%, transparent)' }} />
+        <div className="absolute pointer-events-none" style={{ top: -40, right: -40, width: 120, height: 120, background: 'radial-gradient(circle, rgba(94,196,192,0.06) 0%, transparent 70%)' }} />
 
         <div className="flex items-center gap-4 p-5">
           <CharacterAvatar name={char?.name || 'T'} bearing={char?.bearing} size="lg" />
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-display font-bold truncate" style={{ fontSize: 18, color: 'var(--fq-text-primary)', letterSpacing: '0.02em' }}>
-                {char?.name || 'Traveller'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 mb-3">
-              {disciplineMeta && (
+            <span className="font-display font-bold truncate block mb-1" style={{ fontSize: 18, color: 'var(--fq-text-primary)', letterSpacing: '0.02em' }}>
+              {char?.name || 'Traveller'}
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5 mb-3">
+              {char?.disciplines?.slice(0, 2).map(d => (
                 <span
+                  key={d}
                   className="font-display uppercase"
-                  style={{ fontSize: 8, letterSpacing: '0.14em', color: 'var(--fq-xp)', background: 'rgba(212,168,75,0.1)', border: '1px solid rgba(212,168,75,0.25)', borderRadius: 4, padding: '2px 7px' }}
+                  style={{ fontSize: 7, letterSpacing: '0.12em', color: 'var(--fq-xp)', background: 'rgba(212,168,75,0.1)', border: '1px solid rgba(212,168,75,0.22)', borderRadius: 4, padding: '2px 6px' }}
                 >
-                  {disciplineMeta.label}
+                  {DISCIPLINE_META[d].label}
                 </span>
-              )}
+              ))}
               <span
                 className="font-display uppercase"
-                style={{ fontSize: 8, letterSpacing: '0.12em', color: 'var(--fq-teal)', background: 'rgba(94,196,192,0.08)', border: '1px solid rgba(94,196,192,0.2)', borderRadius: 4, padding: '2px 7px' }}
+                style={{ fontSize: 7, letterSpacing: '0.12em', color: 'var(--fq-teal)', background: 'rgba(94,196,192,0.08)', border: '1px solid rgba(94,196,192,0.2)', borderRadius: 4, padding: '2px 6px' }}
               >
                 Level {overallLevel}
               </span>
@@ -317,7 +280,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Total hours */}
         {totalMinutes > 0 && (
           <div className="px-5 pb-4 flex items-center gap-4">
             <div>
@@ -332,46 +294,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      {/* Active Skills Row */}
-      {activeSkills.length > 0 && (
-        <div className="mb-5 animate-fade-in">
-          <p className="font-display uppercase mb-3" style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-text-muted)' }}>
-            Active Skills
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {activeSkills.slice(0, 4).map(us => {
-              const def = SKILLS_LIBRARY.find(s => s.id === us.skillId);
-              if (!def) return null;
-              const lvl = getSkillLevel(us.totalMinutes);
-              return (
-                <div
-                  key={us.skillId}
-                  className="inline-flex items-center gap-2 font-display"
-                  style={{
-                    background: 'var(--fq-surface)',
-                    border: '1px solid var(--fq-border)',
-                    borderRadius: 999,
-                    padding: '6px 12px 6px 8px',
-                    fontSize: 10,
-                    letterSpacing: '0.08em',
-                    color: 'var(--fq-text-body)',
-                  }}
-                >
-                  <div
-                    className="flex items-center justify-center rounded-md"
-                    style={{ width: 22, height: 22, background: 'rgba(94,196,192,0.07)', borderRadius: 6 }}
-                  >
-                    <SkillIcon iconName={def.icon} size={12} style={{ color: 'var(--fq-teal)' }} />
-                  </div>
-                  <span>{def.name}</span>
-                  <span style={{ color: 'var(--fq-teal)' }}>·{lvl}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Weekly Activity */}
       <div
@@ -402,11 +324,7 @@ export default function Home() {
         Begin Focus Session
       </button>
 
-      {/* Ambient footer */}
-      <p
-        className="font-serif italic text-center mt-5"
-        style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}
-      >
+      <p className="font-serif italic text-center mt-5" style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}>
         Each hour a stone laid on the path.
       </p>
 

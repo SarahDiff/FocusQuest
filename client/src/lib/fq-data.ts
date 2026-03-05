@@ -3,12 +3,13 @@
 // ══════════════════════════════════════════════════
 
 export type Bearing = 'male' | 'neutral' | 'female';
-export type Discipline = 'scholar' | 'warrior' | 'scribe' | 'adventurer';
-export type SkillCategory = 'mind' | 'body' | 'creative' | 'social' | 'outdoors';
+export type Discipline =
+  | 'scholar' | 'warrior' | 'scribe' | 'adventurer'
+  | 'ranger' | 'alchemist' | 'bard' | 'monk';
 
 export interface Character {
   name: string;
-  discipline: Discipline;
+  disciplines: Discipline[];
   bearing: Bearing;
   hairIndex?: number;
   hairLengthIndex?: number;
@@ -16,18 +17,9 @@ export interface Character {
   eyeColorIndex?: number;
 }
 
-export interface SkillDef {
-  id: string;
-  name: string;
-  category: SkillCategory;
-  icon: string;
-  description: string;
-}
-
-export interface UserSkill {
-  skillId: string;
+export interface UserDiscipline {
+  disciplineId: Discipline;
   totalMinutes: number;
-  isActive: boolean;
 }
 
 export interface Session {
@@ -50,65 +42,25 @@ export interface ActiveSessionData {
 export interface AppState {
   character: Character | null;
   onboardingComplete: boolean;
-  userSkills: UserSkill[];
+  userDisciplines: UserDiscipline[];
   sessions: Session[];
   activeSession: ActiveSessionData | null;
 }
 
-// ── Skill Library ──────────────────────────────────
+// ── Discipline Metadata ────────────────────────────
 
-export const SKILLS_LIBRARY: SkillDef[] = [
-  // Mind
-  { id: 'reading', name: 'Reading', category: 'mind', icon: 'BookOpen', description: 'Deep in the pages of worlds unknown.' },
-  { id: 'studying', name: 'Studying', category: 'mind', icon: 'GraduationCap', description: 'Each concept a stone laid on the path.' },
-  { id: 'language', name: 'Language Learning', category: 'mind', icon: 'Globe', description: 'New tongues open hidden realms.' },
-  { id: 'meditation', name: 'Meditation', category: 'mind', icon: 'Moon', description: 'Stillness is its own kind of power.' },
-  { id: 'chess', name: 'Chess', category: 'mind', icon: 'Crown', description: 'The ancient game of kings and patience.' },
-  // Body
-  { id: 'fitness', name: 'Fitness', category: 'body', icon: 'Dumbbell', description: 'The body is your first instrument.' },
-  { id: 'running', name: 'Running', category: 'body', icon: 'Wind', description: 'Motion clears the mind and sharpens will.' },
-  { id: 'yoga', name: 'Yoga', category: 'body', icon: 'Layers', description: 'Breath and form as one practice.' },
-  { id: 'cycling', name: 'Cycling', category: 'body', icon: 'Bike', description: 'Miles become legend, slowly.' },
-  { id: 'hiking', name: 'Hiking', category: 'body', icon: 'Mountain', description: 'The path itself is the reward.' },
-  // Creative
-  { id: 'writing', name: 'Writing', category: 'creative', icon: 'PenLine', description: 'Words are the spells you leave behind.' },
-  { id: 'art', name: 'Drawing & Art', category: 'creative', icon: 'Palette', description: 'To see deeply is to create truly.' },
-  { id: 'music', name: 'Music', category: 'creative', icon: 'Music', description: 'Sound shaped by will and feeling.' },
-  { id: 'photography', name: 'Photography', category: 'creative', icon: 'Camera', description: 'Capturing light and meaning at once.' },
-  { id: 'crafts', name: 'Crafts', category: 'creative', icon: 'Scissors', description: 'Making with hands is its own wisdom.' },
-  // Social
-  { id: 'conversation', name: 'Deep Conversation', category: 'social', icon: 'MessageCircle', description: 'True presence is a rare offering.' },
-  { id: 'journaling', name: 'Journaling', category: 'social', icon: 'BookHeart', description: 'The self, examined, grows wiser.' },
-  { id: 'community', name: 'Community Service', category: 'social', icon: 'Heart', description: 'Strength given freely returns tenfold.' },
-  // Outdoors
-  { id: 'nature', name: 'Nature Walks', category: 'outdoors', icon: 'Leaf', description: 'The world restores what noise takes away.' },
-  { id: 'gardening', name: 'Gardening', category: 'outdoors', icon: 'Flower2', description: 'Growth, tended slowly, is the truest kind.' },
-  { id: 'exploration', name: 'Exploration', category: 'outdoors', icon: 'Compass', description: 'Every horizon holds a new legend.' },
-];
-
-// ── Discipline → Starting Skills ──────────────────
-
-export const DISCIPLINE_SKILLS: Record<Discipline, string[]> = {
-  scholar:    ['reading', 'studying', 'language', 'meditation'],
-  warrior:    ['fitness', 'running', 'hiking', 'yoga'],
-  scribe:     ['writing', 'journaling', 'reading', 'art'],
-  adventurer: ['hiking', 'photography', 'exploration', 'nature'],
+export const DISCIPLINE_META: Record<Discipline, { label: string; tagline: string; description: string; glyph: string }> = {
+  scholar:    { label: 'Scholar',    tagline: 'Seeker of wisdom',      description: 'You pursue knowledge with quiet dedication. Books, study, and contemplation are your weapons.',       glyph: '✦'  },
+  warrior:    { label: 'Warrior',    tagline: 'Forged by effort',      description: 'Discipline of body is discipline of mind. You find truth through movement and endurance.',             glyph: '⚔'  },
+  scribe:     { label: 'Scribe',     tagline: 'Weaver of worlds',      description: 'You give form to ideas others cannot yet name. The page is your realm.',                               glyph: '✒'  },
+  adventurer: { label: 'Adventurer', tagline: 'Beyond the horizon',    description: 'Every journey changes you. You seek growth through exploration and discovery.',                         glyph: '◎'  },
+  ranger:     { label: 'Ranger',     tagline: 'Trail & instinct',      description: 'Reading the land, moving with purpose. The wild is your domain and truest teacher.',                   glyph: '⬟'  },
+  alchemist:  { label: 'Alchemist',  tagline: 'Transmute & create',    description: 'Turning experiment into mastery. You find wisdom in the laboratory of life.',                          glyph: '⬡'  },
+  bard:       { label: 'Bard',       tagline: 'Voice & vision',        description: 'Weaving creativity into every endeavour. Art, music, and story are your craft.',                       glyph: '♬'  },
+  monk:       { label: 'Monk',       tagline: 'Still & transcendent',  description: 'In stillness, the sharpest clarity is found. Body and spirit move as one.',                           glyph: '◇'  },
 };
 
-export const DISCIPLINE_META: Record<Discipline, { label: string; tagline: string; description: string }> = {
-  scholar:    { label: 'The Scholar', tagline: 'Seeker of wisdom', description: 'You pursue knowledge with quiet dedication. Books, study, and contemplation are your weapons.' },
-  warrior:    { label: 'The Warrior', tagline: 'Forged by effort', description: 'Discipline of body is discipline of mind. You find truth through movement and endurance.' },
-  scribe:     { label: 'The Scribe', tagline: 'Weaver of worlds', description: 'You give form to ideas others cannot yet name. The page is your realm.' },
-  adventurer: { label: 'The Adventurer', tagline: 'Beyond the next horizon', description: 'Every journey changes you. You seek growth through exploration and discovery.' },
-};
-
-export const CATEGORY_LABELS: Record<SkillCategory, string> = {
-  mind:     'Mind',
-  body:     'Body',
-  creative: 'Creative',
-  social:   'Social',
-  outdoors: 'Outdoors',
-};
+export const ALL_DISCIPLINES = Object.keys(DISCIPLINE_META) as Discipline[];
 
 // ── Leveling ──────────────────────────────────────
 
@@ -142,10 +94,6 @@ export function formatTimer(seconds: number): string {
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-export function getSkillById(id: string): SkillDef | undefined {
-  return SKILLS_LIBRARY.find(s => s.id === id);
-}
-
 export function getTimeOfDayGreeting(): string {
   const h = new Date().getHours();
   if (h < 5)  return 'Still the night';
@@ -162,7 +110,7 @@ const STORAGE_KEY = 'focusquest_v1';
 const DEFAULT_STATE: AppState = {
   character: null,
   onboardingComplete: false,
-  userSkills: [],
+  userDisciplines: [],
   sessions: [],
   activeSession: null,
 };
@@ -171,7 +119,18 @@ export function loadState(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { ...DEFAULT_STATE };
-    return { ...DEFAULT_STATE, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    // Migration: old data had userSkills → convert to userDisciplines
+    if (parsed.userSkills && !parsed.userDisciplines) {
+      parsed.userDisciplines = [];
+      delete parsed.userSkills;
+    }
+    // Migration: old character had single discipline → array
+    if (parsed.character?.discipline && !parsed.character?.disciplines) {
+      parsed.character.disciplines = [parsed.character.discipline];
+      delete parsed.character.discipline;
+    }
+    return { ...DEFAULT_STATE, ...parsed };
   } catch {
     return { ...DEFAULT_STATE };
   }

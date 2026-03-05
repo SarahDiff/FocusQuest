@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Pause, Play, Square, ChevronRight } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
-import { getSkillLevel, getSkillXPProgress, formatTimer, calculateXP, SKILLS_LIBRARY, type Session } from "@/lib/fq-data";
+import { getSkillLevel, getSkillXPProgress, formatTimer, calculateXP, DISCIPLINE_META, type Session } from "@/lib/fq-data";
 import XPBar from "@/components/xp-bar";
-import SkillIcon from "@/components/skill-icon";
+import characterImg from "@assets/ChatGPT_Image_Mar_5,_2026_at_08_15_07_PM_1772738146448.png";
 
 // ── SVG Timer Ring ─────────────────────────────────
 
@@ -15,22 +15,8 @@ function TimerRing({ pct }: { pct: number }) {
 
   return (
     <svg width="160" height="160" viewBox="0 0 160 160" style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
-      {/* Dashed outer ring */}
-      <circle
-        cx="80" cy="80" r={76}
-        fill="none"
-        stroke="rgba(180,210,240,0.07)"
-        strokeWidth="0.8"
-        strokeDasharray="3 9"
-      />
-      {/* Track */}
-      <circle
-        cx="80" cy="80" r={radius}
-        fill="none"
-        stroke="rgba(255,255,255,0.04)"
-        strokeWidth="3"
-      />
-      {/* Fill — XP gold */}
+      <circle cx="80" cy="80" r={76} fill="none" stroke="rgba(180,210,240,0.07)" strokeWidth="0.8" strokeDasharray="3 9" />
+      <circle cx="80" cy="80" r={radius} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="3" />
       <circle
         cx="80" cy="80" r={radius}
         fill="none"
@@ -39,10 +25,7 @@ function TimerRing({ pct }: { pct: number }) {
         strokeLinecap="round"
         strokeDasharray={circ}
         strokeDashoffset={offset}
-        style={{
-          transition: 'stroke-dashoffset 1s linear',
-          filter: 'drop-shadow(0 0 6px rgba(212,168,75,0.55))',
-        }}
+        style={{ transition: 'stroke-dashoffset 1s linear', filter: 'drop-shadow(0 0 6px rgba(212,168,75,0.55))' }}
       />
     </svg>
   );
@@ -56,9 +39,9 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
   newLevel: number;
   onReturn: () => void;
 }) {
-  const skillDef = SKILLS_LIBRARY.find(s => s.id === session.skillId);
+  const { state } = useFQ();
+  const disciplineMeta = DISCIPLINE_META[session.skillId as keyof typeof DISCIPLINE_META];
   const didLevelUp = newLevel > prevLevel;
-  const progress = getSkillXPProgress(newLevel * 60 - (60 - (session.durationMinutes % 60)));
 
   const h = Math.floor(session.durationMinutes / 60);
   const m = session.durationMinutes % 60;
@@ -71,7 +54,6 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
       className="min-h-screen flex flex-col items-center justify-center p-8 relative"
       style={{ background: '#0f1318' }}
     >
-      {/* Atmospheric glow */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -81,42 +63,31 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
         }}
       />
 
-      {/* Sparkle sigil */}
-      <div className="relative flex items-center justify-center mb-8" style={{ width: 120, height: 120 }}>
+      {/* Character portrait */}
+      <div className="relative flex items-center justify-center mb-6" style={{ width: 120, height: 120 }}>
         <div
           className="absolute inset-0 rounded-full"
-          style={{
-            border: '1px dashed rgba(212,168,75,0.3)',
-            animation: 'spin-slow 8s linear infinite',
-          }}
+          style={{ border: '1px dashed rgba(212,168,75,0.35)', animation: 'spin-slow 8s linear infinite' }}
         />
         <div
-          className="absolute rounded-full"
-          style={{ inset: 16, border: '1px solid rgba(212,168,75,0.15)' }}
-        />
-        <span
-          className="font-display font-bold text-5xl relative z-10"
-          style={{ color: 'var(--fq-xp)', textShadow: '0 0 30px rgba(212,168,75,0.6)' }}
+          className="absolute rounded-full overflow-hidden"
+          style={{ inset: 8, border: '2px solid rgba(212,168,75,0.5)', boxShadow: '0 0 20px rgba(212,168,75,0.3)' }}
         >
-          ✦
-        </span>
+          <img
+            src={characterImg}
+            alt="Your Traveller"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 10%' }}
+          />
+        </div>
       </div>
 
-      {/* Quest Complete */}
-      <p
-        className="font-display uppercase mb-2 animate-fade-in"
-        style={{ fontSize: 10, letterSpacing: '0.3em', color: 'var(--fq-teal)', opacity: 0.85 }}
-      >
+      <p className="font-display uppercase mb-2 animate-fade-in" style={{ fontSize: 10, letterSpacing: '0.3em', color: 'var(--fq-teal)', opacity: 0.85 }}>
         Session Complete
       </p>
-      <h1
-        className="font-display font-bold mb-8 animate-fade-in"
-        style={{ fontSize: 32, color: 'var(--fq-text-primary)', letterSpacing: '0.04em', textAlign: 'center' }}
-      >
+      <h1 className="font-display font-bold mb-8 animate-fade-in" style={{ fontSize: 32, color: 'var(--fq-text-primary)', letterSpacing: '0.04em', textAlign: 'center' }}>
         Quest Complete
       </h1>
 
-      {/* Stats card */}
       <div
         className="w-full max-w-[340px] rounded-2xl mb-6 overflow-hidden relative animate-scale-in"
         style={{
@@ -125,23 +96,21 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
           boxShadow: 'var(--fq-shadow-card)',
         }}
       >
-        <div
-          className="absolute top-0 left-0 right-0"
-          style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(212,168,75,0.4) 50%, transparent)' }}
-        />
+        <div className="absolute top-0 left-0 right-0" style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(212,168,75,0.4) 50%, transparent)' }} />
 
         <div className="p-6">
-          {/* Skill */}
           <div className="flex items-center gap-3 mb-5">
             <div
-              className="flex items-center justify-center rounded-xl"
+              className="flex items-center justify-center rounded-xl flex-shrink-0"
               style={{ width: 44, height: 44, background: 'rgba(94,196,192,0.08)', border: '1px solid var(--fq-border-teal)' }}
             >
-              {skillDef && <SkillIcon iconName={skillDef.icon} size={20} style={{ color: 'var(--fq-teal)' }} />}
+              <span className="font-display text-xl" style={{ color: 'var(--fq-teal)' }}>
+                {disciplineMeta?.glyph ?? '◎'}
+              </span>
             </div>
             <div>
               <p className="font-display font-medium" style={{ fontSize: 14, color: 'var(--fq-text-primary)', letterSpacing: '0.04em' }}>
-                {skillDef?.name || session.skillId}
+                {disciplineMeta?.label ?? session.skillName}
               </p>
               <p className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.14em', color: 'var(--fq-text-muted)' }}>
                 Level {newLevel}
@@ -149,7 +118,6 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
             </div>
           </div>
 
-          {/* Stats row */}
           <div className="flex items-stretch gap-4 mb-5">
             <div className="flex-1 text-center">
               <p className="font-display uppercase mb-1" style={{ fontSize: 7, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}>Duration</p>
@@ -158,16 +126,12 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
             <div style={{ width: 1, background: 'var(--fq-border)' }} />
             <div className="flex-1 text-center">
               <p className="font-display uppercase mb-1" style={{ fontSize: 7, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}>XP Earned</p>
-              <p
-                className="font-display font-bold"
-                style={{ fontSize: 22, color: 'var(--fq-xp-bright)', textShadow: '0 0 16px rgba(212,168,75,0.5)' }}
-              >
+              <p className="font-display font-bold" style={{ fontSize: 22, color: 'var(--fq-xp-bright)', textShadow: '0 0 16px rgba(212,168,75,0.5)' }}>
                 +{session.xpEarned}
               </p>
             </div>
           </div>
 
-          {/* Level up */}
           {didLevelUp && (
             <div
               className="rounded-xl p-3 mb-4 flex items-center gap-3"
@@ -176,7 +140,7 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
               <span className="font-display text-xl" style={{ color: 'var(--fq-xp)' }}>⬆</span>
               <div>
                 <p className="font-display font-semibold" style={{ fontSize: 12, color: 'var(--fq-xp-bright)', letterSpacing: '0.06em' }}>
-                  Level Up — {skillDef?.name}
+                  Level Up — {disciplineMeta?.label}
                 </p>
                 <p className="font-serif italic" style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}>
                   Reached Level {newLevel}
@@ -185,7 +149,6 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
             </div>
           )}
 
-          {/* XP bar */}
           <div>
             <div className="flex justify-between items-baseline mb-1.5">
               <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.14em', color: 'var(--fq-text-muted)' }}>Progress to Level {newLevel + 1}</span>
@@ -196,15 +159,10 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
         </div>
       </div>
 
-      {/* Ambient quote */}
-      <p
-        className="font-serif italic text-center mb-8"
-        style={{ fontSize: 14, color: 'var(--fq-moon)', maxWidth: 280 }}
-      >
+      <p className="font-serif italic text-center mb-8" style={{ fontSize: 14, color: 'var(--fq-moon)', maxWidth: 280 }}>
         The realm stirs as you work.
       </p>
 
-      {/* Return button */}
       <button
         onClick={onReturn}
         className="font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-2"
@@ -238,18 +196,14 @@ export default function Session() {
 
   const as = state.activeSession;
 
-  // Redirect if no active session
   useEffect(() => {
-    if (!as && !completedSession) {
-      navigate('/');
-    }
+    if (!as && !completedSession) navigate('/');
   }, [as, completedSession, navigate]);
 
-  // Live timer
   useEffect(() => {
     if (!as) return;
     const tick = () => {
-      if (as.pausedAt !== null) return; // paused
+      if (as.pausedAt !== null) return;
       const now = Date.now();
       const elapsedMs = now - as.startTime - as.totalPausedMs;
       setElapsed(Math.floor(elapsedMs / 1000));
@@ -272,9 +226,9 @@ export default function Session() {
     );
   }
 
-  const skillDef = as ? SKILLS_LIBRARY.find(s => s.id === as.skillId) : null;
-  const userSkill = as ? state.userSkills.find(s => s.skillId === as.skillId) : null;
-  const currentLevel = userSkill ? getSkillLevel(userSkill.totalMinutes) : 1;
+  const disciplineMeta = as ? DISCIPLINE_META[as.skillId as keyof typeof DISCIPLINE_META] : null;
+  const userDiscipline = as ? state.userDisciplines.find(d => d.disciplineId === as.skillId) : null;
+  const currentLevel = userDiscipline ? getSkillLevel(userDiscipline.totalMinutes) : 1;
   const currentXP = calculateXP(Math.floor(elapsed / 60));
   const isPaused = as?.pausedAt !== null;
   const targetSecs = as?.targetMinutes ? as.targetMinutes * 60 : null;
@@ -286,10 +240,10 @@ export default function Session() {
   }
 
   function handleEnd() {
-    const prevLvl = userSkill ? getSkillLevel(userSkill.totalMinutes) : 1;
+    const prevLvl = userDiscipline ? getSkillLevel(userDiscipline.totalMinutes) : 1;
     const sess = endSession();
     if (sess) {
-      const newLvl = getSkillLevel((userSkill?.totalMinutes || 0) + sess.durationMinutes);
+      const newLvl = getSkillLevel((userDiscipline?.totalMinutes || 0) + sess.durationMinutes);
       setPrevLevel(prevLvl);
       setNewLevel(newLvl);
       setCompletedSession(sess);
@@ -299,29 +253,16 @@ export default function Session() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col relative overflow-hidden"
-      style={{ background: '#090c10' }}
-    >
-      {/* Deep ambient glows */}
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#090c10' }}>
       <div
         className="absolute pointer-events-none"
-        style={{
-          top: '30%', left: '50%', transform: 'translateX(-50%)',
-          width: 300, height: 300,
-          background: 'radial-gradient(circle, rgba(212,168,75,0.08) 0%, transparent 70%)',
-        }}
+        style={{ top: '30%', left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(212,168,75,0.08) 0%, transparent 70%)' }}
       />
       <div
         className="absolute pointer-events-none"
-        style={{
-          bottom: 0, left: '20%',
-          width: 200, height: 200,
-          background: 'radial-gradient(circle, rgba(94,196,192,0.05) 0%, transparent 70%)',
-        }}
+        style={{ bottom: 0, left: '20%', width: 200, height: 200, background: 'radial-gradient(circle, rgba(94,196,192,0.05) 0%, transparent 70%)' }}
       />
 
-      {/* Skill tag */}
       <div className="flex justify-center pt-14 pb-4">
         <div
           className="inline-flex items-center gap-2 font-display uppercase"
@@ -335,97 +276,64 @@ export default function Session() {
             color: 'var(--fq-teal)',
           }}
         >
-          {skillDef && <SkillIcon iconName={skillDef.icon} size={12} style={{ color: 'var(--fq-teal)' }} />}
-          {skillDef?.name || 'Focus'}
+          <span style={{ fontSize: 12 }}>{disciplineMeta?.glyph ?? '◎'}</span>
+          {disciplineMeta?.label ?? 'Focus'}
         </div>
       </div>
 
-      {/* Timer ring */}
       <div className="flex-1 flex flex-col items-center justify-center">
-        <div
-          className="relative flex items-center justify-center mb-3"
-          style={{ width: 200, height: 200 }}
-        >
-          {/* SVG ring */}
+        <div className="relative flex items-center justify-center mb-3" style={{ width: 200, height: 200 }}>
           <div style={{ position: 'absolute', inset: 20 }}>
             <TimerRing pct={ringPct} />
           </div>
-
-          {/* Timer digits */}
           <div className="relative z-10 flex flex-col items-center">
             <span
               className="font-display font-bold"
-              style={{
-                fontSize: 42,
-                color: isPaused ? 'var(--fq-text-muted)' : 'var(--fq-text-primary)',
-                letterSpacing: '0.04em',
-                lineHeight: 1,
-                transition: 'color 0.3s',
-              }}
+              style={{ fontSize: 42, color: isPaused ? 'var(--fq-text-muted)' : 'var(--fq-text-primary)', letterSpacing: '0.04em', lineHeight: 1, transition: 'color 0.3s' }}
               data-testid="timer-display"
             >
               {formatTimer(elapsed)}
             </span>
-            <span
-              className="font-serif italic mt-2"
-              style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}
-            >
+            <span className="font-serif italic mt-2" style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}>
               {isPaused ? 'paused' : targetSecs ? `of ${formatTimer(targetSecs)}` : 'in focus'}
             </span>
           </div>
         </div>
 
-        {/* XP counter */}
         <div className="flex flex-col items-center gap-1">
           <span
             className="font-display font-bold"
-            style={{
-              fontSize: 22,
-              color: 'var(--fq-xp-bright)',
-              textShadow: '0 0 16px rgba(212,168,75,0.5)',
-            }}
+            style={{ fontSize: 22, color: 'var(--fq-xp-bright)', textShadow: '0 0 16px rgba(212,168,75,0.5)' }}
             data-testid="xp-counter"
           >
             +{currentXP} XP
           </span>
-          <span
-            className="font-serif italic"
-            style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}
-          >
-            earned so far
-          </span>
+          <span className="font-serif italic" style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}>earned so far</span>
         </div>
 
-        {/* Level progress */}
-        {userSkill && (
+        {userDiscipline && (
           <div className="mt-4 w-48">
             <div className="flex justify-between items-baseline mb-1.5">
               <span className="font-display uppercase" style={{ fontSize: 7, letterSpacing: '0.14em', color: 'var(--fq-text-muted)' }}>
                 Level {currentLevel}
               </span>
               <span className="font-display" style={{ fontSize: 8, color: 'var(--fq-xp)' }}>
-                {Math.round(getSkillXPProgress(userSkill.totalMinutes + Math.floor(elapsed / 60)).pct)}%
+                {Math.round(getSkillXPProgress(userDiscipline.totalMinutes + Math.floor(elapsed / 60)).pct)}%
               </span>
             </div>
-            <XPBar pct={getSkillXPProgress(userSkill.totalMinutes + Math.floor(elapsed / 60)).pct} height={3} />
+            <XPBar pct={getSkillXPProgress(userDiscipline.totalMinutes + Math.floor(elapsed / 60)).pct} height={3} />
           </div>
         )}
       </div>
 
-      {/* Ambient footer */}
       <div className="px-6 pb-4 text-center">
         <p className="font-serif italic" style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}>
           {isPaused ? 'The realm awaits your return.' : 'Stay in the moment.'}
         </p>
       </div>
 
-      {/* Controls */}
-      <div
-        className="px-6 pb-10 pt-4"
-        style={{ borderTop: '1px solid var(--fq-border)' }}
-      >
+      <div className="px-6 pb-10 pt-4" style={{ borderTop: '1px solid var(--fq-border)' }}>
         <div className="flex items-center gap-4">
-          {/* Pause / Resume */}
           <button
             onClick={handlePauseResume}
             className="flex-1 flex items-center justify-center gap-2 font-display tracking-[0.12em] uppercase cursor-pointer transition-all duration-200"
@@ -444,7 +352,6 @@ export default function Session() {
             {isPaused ? 'Resume' : 'Pause'}
           </button>
 
-          {/* End Session */}
           <button
             onClick={handleEnd}
             className="flex items-center justify-center gap-2 font-display tracking-[0.12em] uppercase cursor-pointer transition-all duration-200"

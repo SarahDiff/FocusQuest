@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { ChevronRight, ChevronLeft, ChevronDown, User } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
-import { type Bearing, type Discipline, DISCIPLINE_META } from "@/lib/fq-data";
+import { type Bearing, type Discipline, DISCIPLINE_META, ALL_DISCIPLINES } from "@/lib/fq-data";
 import characterImg from "@assets/ChatGPT_Image_Mar_5,_2026_at_08_15_07_PM_1772738146448.png";
 
 type Step = 'splash' | 'philosophy' | 'identity' | 'avatar' | 'discipline' | 'quest';
@@ -24,12 +24,6 @@ const HAIR_LENGTH_OPTIONS = ['Cropped', 'Short', 'Shoulder', 'Long Straight', 'L
 const SKIN_OPTIONS = ['Alabaster', 'Pale Rose', 'Sun-Kissed', 'Bronze', 'Copper', 'Ebony'];
 const EYE_COLOR_OPTIONS = ['Storm Grey', 'Forest Green', 'Ocean Blue', 'Amber', 'Onyx', 'Violet'];
 
-const DISCIPLINES: { value: Discipline; glyph: string }[] = [
-  { value: 'scholar', glyph: '✦' },
-  { value: 'warrior', glyph: '⚔' },
-  { value: 'scribe', glyph: '✒' },
-  { value: 'adventurer', glyph: '◎' },
-];
 
 function SectionDivider({ label }: { label: string }) {
   return (
@@ -92,7 +86,15 @@ export default function Onboarding() {
   const [step, setStep] = useState<Step>('splash');
   const [name, setName] = useState('');
   const [bearing, setBearing] = useState<Bearing>('neutral');
-  const [discipline, setDiscipline] = useState<Discipline | null>(null);
+  const [disciplines, setDisciplines] = useState<Discipline[]>([]);
+
+  function toggleDiscipline(d: Discipline) {
+    if (disciplines.includes(d)) {
+      setDisciplines(disciplines.filter(x => x !== d));
+    } else if (disciplines.length < 3) {
+      setDisciplines([...disciplines, d]);
+    }
+  }
   const [hairIndex, setHairIndex] = useState(1);
   const [hairLengthIndex, setHairLengthIndex] = useState(3);
   const [skinIndex, setSkinIndex] = useState(2);
@@ -103,8 +105,8 @@ export default function Onboarding() {
   }
 
   function finish() {
-    if (!discipline) return;
-    completeOnboarding({ name: name.trim() || 'Traveller', discipline, bearing, hairIndex, hairLengthIndex, skinIndex, eyeColorIndex });
+    if (disciplines.length === 0) return;
+    completeOnboarding({ name: name.trim() || 'Traveller', disciplines, bearing, hairIndex, hairLengthIndex, skinIndex, eyeColorIndex });
     navigate('/');
   }
 
@@ -565,102 +567,117 @@ export default function Onboarding() {
 
   // ── Discipline ─────────────────────────────────────
   if (step === 'discipline') {
+    const canProceed = disciplines.length > 0;
+    const atMax = disciplines.length >= 3;
+
     return (
-      <div style={{ ...containerStyle, justifyContent: 'flex-start', paddingTop: 56 }}>
-        <div className="w-full max-w-[380px] animate-fade-in">
+      <div style={{ ...containerStyle, justifyContent: 'flex-start', paddingTop: 48, paddingBottom: 48, overflowY: 'auto' }}
+        className="fq-scroll animate-fade-in"
+      >
+        <div className="w-full max-w-[400px]">
           <button
             onClick={() => next('avatar')}
-            className="flex items-center gap-1 mb-8 cursor-pointer"
+            className="flex items-center gap-1 mb-6 cursor-pointer"
             style={{ background: 'none', border: 'none', color: 'var(--fq-text-muted)', fontSize: 12 }}
           >
             <ChevronLeft size={14} /> Back
           </button>
 
           <p
-            className="font-display mb-2"
+            className="font-display mb-1"
             style={{ fontSize: 10, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.8, textTransform: 'uppercase' }}
           >
             Your Path
           </p>
           <h2
-            className="font-display font-semibold mb-2"
+            className="font-display font-semibold mb-1"
             style={{ fontSize: 22, color: 'var(--fq-text-primary)' }}
           >
-            Choose Your Discipline
+            Choose Your Disciplines
           </h2>
-          <p
-            className="font-serif italic mb-8"
-            style={{ fontSize: 15, color: 'var(--fq-text-muted)' }}
-          >
-            More paths unlock as you grow.
-          </p>
+          <div className="flex items-center justify-between mb-6">
+            <p className="font-serif italic" style={{ fontSize: 14, color: 'var(--fq-text-muted)' }}>
+              Pick up to three to begin with.
+            </p>
+            <span
+              className="font-display uppercase"
+              style={{
+                fontSize: 9, letterSpacing: '0.14em',
+                color: atMax ? 'var(--fq-xp)' : 'var(--fq-text-muted)',
+                background: atMax ? 'rgba(212,168,75,0.1)' : 'transparent',
+                border: `1px solid ${atMax ? 'rgba(212,168,75,0.3)' : 'transparent'}`,
+                borderRadius: 999, padding: atMax ? '2px 8px' : '0',
+                transition: 'all 0.2s',
+              }}
+            >
+              {disciplines.length} / 3
+            </span>
+          </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            {DISCIPLINES.map(({ value, glyph }) => {
+          <div className="grid grid-cols-2 gap-2.5 mb-6">
+            {ALL_DISCIPLINES.map(value => {
               const meta = DISCIPLINE_META[value];
-              const selected = discipline === value;
+              const selected = disciplines.includes(value);
+              const disabled = !selected && atMax;
               return (
                 <button
                   key={value}
-                  onClick={() => setDiscipline(value)}
-                  className="cursor-pointer transition-all duration-200 rounded-2xl text-left"
+                  onClick={() => toggleDiscipline(value)}
+                  disabled={disabled}
+                  className="transition-all duration-200 rounded-2xl text-left"
                   data-testid={`button-discipline-${value}`}
                   style={{
                     background: selected ? 'rgba(94,196,192,0.1)' : 'var(--fq-frost-subtle)',
                     border: `1.5px solid ${selected ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
                     backdropFilter: 'blur(14px)',
-                    borderRadius: 20,
-                    padding: '20px 16px',
+                    borderRadius: 18,
+                    padding: '14px 14px',
                     outline: 'none',
-                    boxShadow: selected ? '0 0 20px rgba(94,196,192,0.18), var(--fq-shadow-card)' : 'var(--fq-shadow-card)',
+                    boxShadow: selected ? '0 0 18px rgba(94,196,192,0.18), var(--fq-shadow-card)' : 'var(--fq-shadow-card)',
+                    opacity: disabled ? 0.38 : 1,
+                    cursor: disabled ? 'not-allowed' : 'pointer',
                   }}
                 >
                   <div
-                    className="font-display text-2xl mb-3"
-                    style={{ color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', textShadow: selected ? '0 0 16px rgba(94,196,192,0.5)' : 'none' }}
+                    className="font-display text-xl mb-2"
+                    style={{ color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', textShadow: selected ? '0 0 14px rgba(94,196,192,0.5)' : 'none' }}
                   >
-                    {glyph}
+                    {meta.glyph}
                   </div>
                   <div
-                    className="font-display font-semibold mb-1"
-                    style={{ fontSize: 13, color: selected ? 'var(--fq-text-primary)' : 'var(--fq-text-body)', letterSpacing: '0.04em' }}
+                    className="font-display font-semibold mb-0.5"
+                    style={{ fontSize: 12, color: selected ? 'var(--fq-text-primary)' : 'var(--fq-text-body)', letterSpacing: '0.04em' }}
                   >
                     {meta.label}
                   </div>
                   <div
                     className="font-display uppercase"
-                    style={{ fontSize: 8, letterSpacing: '0.14em', color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', marginBottom: 8, opacity: 0.85 }}
+                    style={{ fontSize: 7, letterSpacing: '0.12em', color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', opacity: 0.85 }}
                   >
                     {meta.tagline}
                   </div>
-                  <p
-                    className="font-serif"
-                    style={{ fontSize: 12, color: 'var(--fq-text-muted)', lineHeight: 1.5 }}
-                  >
-                    {meta.description}
-                  </p>
                 </button>
               );
             })}
           </div>
 
           <button
-            onClick={() => discipline && next('quest')}
+            onClick={() => canProceed && next('quest')}
             className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
             data-testid="button-discipline-next"
-            disabled={!discipline}
+            disabled={!canProceed}
             style={{
-              background: discipline
+              background: canProceed
                 ? 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)'
                 : 'rgba(255,255,255,0.03)',
-              border: `1.5px solid ${discipline ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
-              color: discipline ? 'var(--fq-teal-bright)' : 'var(--fq-text-muted)',
+              border: `1.5px solid ${canProceed ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
+              color: canProceed ? 'var(--fq-teal-bright)' : 'var(--fq-text-muted)',
               borderRadius: 999,
               padding: '15px 36px',
               fontSize: 11,
-              boxShadow: discipline ? '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)' : 'none',
-              opacity: discipline ? 1 : 0.5,
-              cursor: discipline ? 'pointer' : 'not-allowed',
+              boxShadow: canProceed ? '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)' : 'none',
+              opacity: canProceed ? 1 : 0.5,
+              cursor: canProceed ? 'pointer' : 'not-allowed',
             }}
           >
             Forge Your Legend <ChevronRight size={14} />
@@ -672,7 +689,6 @@ export default function Onboarding() {
 
   // ── Quest Begins ───────────────────────────────────
   if (step === 'quest') {
-    const meta = discipline ? DISCIPLINE_META[discipline] : null;
     const displayName = name.trim() || 'Traveller';
 
     return (
@@ -720,14 +736,17 @@ export default function Onboarding() {
             >
               {displayName}
             </h3>
-            {meta && (
-              <p
-                className="font-display uppercase"
-                style={{ fontSize: 9, letterSpacing: '0.14em', color: 'var(--fq-xp)' }}
-              >
-                {meta.label}
-              </p>
-            )}
+            <div className="flex flex-wrap justify-center gap-1.5 mt-1">
+              {disciplines.map(d => (
+                <span
+                  key={d}
+                  className="font-display uppercase"
+                  style={{ fontSize: 8, letterSpacing: '0.12em', color: 'var(--fq-xp)', background: 'rgba(212,168,75,0.1)', border: '1px solid rgba(212,168,75,0.25)', borderRadius: 4, padding: '2px 7px' }}
+                >
+                  {DISCIPLINE_META[d].label}
+                </span>
+              ))}
+            </div>
           </div>
 
           <p

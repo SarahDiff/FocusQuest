@@ -2,11 +2,10 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 import {
   type AppState,
   type Character,
-  type UserSkill,
+  type UserDiscipline,
   type Session,
   type ActiveSessionData,
-  type Discipline,
-  DISCIPLINE_SKILLS,
+  DISCIPLINE_META,
   loadState,
   saveState,
   calculateXP,
@@ -15,12 +14,11 @@ import {
 interface FQContextValue {
   state: AppState;
   completeOnboarding: (character: Character) => void;
-  startSession: (skillId: string, targetMinutes: number | null) => void;
+  startSession: (disciplineId: string, targetMinutes: number | null) => void;
   pauseSession: () => void;
   resumeSession: () => void;
   endSession: () => Session | null;
   addSession: (session: Session) => void;
-  toggleSkillActive: (skillId: string) => void;
   resetApp: () => void;
 }
 
@@ -38,24 +36,22 @@ export function FQProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const completeOnboarding = useCallback((character: Character) => {
-    const startingSkillIds = DISCIPLINE_SKILLS[character.discipline];
-    const userSkills: UserSkill[] = startingSkillIds.map(id => ({
-      skillId: id,
+    const userDisciplines: UserDiscipline[] = character.disciplines.map(d => ({
+      disciplineId: d,
       totalMinutes: 0,
-      isActive: true,
     }));
 
     setState(prev => ({
       ...prev,
       character,
       onboardingComplete: true,
-      userSkills,
+      userDisciplines,
     }));
   }, [setState]);
 
-  const startSession = useCallback((skillId: string, targetMinutes: number | null) => {
+  const startSession = useCallback((disciplineId: string, targetMinutes: number | null) => {
     const session: ActiveSessionData = {
-      skillId,
+      skillId: disciplineId,
       startTime: Date.now(),
       pausedAt: null,
       totalPausedMs: 0,
@@ -106,14 +102,13 @@ export function FQProvider({ children }: { children: ReactNode }) {
         return { ...prev, activeSession: null };
       }
 
-      const skillDef = prev.userSkills.find(s => s.skillId === as.skillId);
-      const skillName = as.skillId;
+      const disciplineMeta = DISCIPLINE_META[as.skillId as keyof typeof DISCIPLINE_META];
       const xpEarned = calculateXP(durationMinutes);
 
       const session: Session = {
         id: `session-${Date.now()}`,
         skillId: as.skillId,
-        skillName,
+        skillName: disciplineMeta?.label ?? as.skillId,
         durationMinutes,
         xpEarned,
         date: new Date().toISOString(),
@@ -121,17 +116,17 @@ export function FQProvider({ children }: { children: ReactNode }) {
 
       completedSession = session;
 
-      const updatedSkills = prev.userSkills.map(s =>
-        s.skillId === as.skillId
-          ? { ...s, totalMinutes: s.totalMinutes + durationMinutes }
-          : s
+      const updatedDisciplines = prev.userDisciplines.map(d =>
+        d.disciplineId === as.skillId
+          ? { ...d, totalMinutes: d.totalMinutes + durationMinutes }
+          : d
       );
 
       return {
         ...prev,
         activeSession: null,
         sessions: [session, ...prev.sessions],
-        userSkills: updatedSkills,
+        userDisciplines: updatedDisciplines,
       };
     });
 
@@ -145,30 +140,11 @@ export function FQProvider({ children }: { children: ReactNode }) {
     }));
   }, [setState]);
 
-  const toggleSkillActive = useCallback((skillId: string) => {
-    setState(prev => {
-      const existing = prev.userSkills.find(s => s.skillId === skillId);
-      if (existing) {
-        return {
-          ...prev,
-          userSkills: prev.userSkills.map(s =>
-            s.skillId === skillId ? { ...s, isActive: !s.isActive } : s
-          ),
-        };
-      } else {
-        return {
-          ...prev,
-          userSkills: [...prev.userSkills, { skillId, totalMinutes: 0, isActive: true }],
-        };
-      }
-    });
-  }, [setState]);
-
   const resetApp = useCallback(() => {
     setState(() => ({
       character: null,
       onboardingComplete: false,
-      userSkills: [],
+      userDisciplines: [],
       sessions: [],
       activeSession: null,
     }));
@@ -183,7 +159,6 @@ export function FQProvider({ children }: { children: ReactNode }) {
       resumeSession,
       endSession,
       addSession,
-      toggleSkillActive,
       resetApp,
     }}>
       {children}

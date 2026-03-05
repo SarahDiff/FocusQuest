@@ -90,8 +90,7 @@ export default function Profile() {
   const [showReset, setShowReset] = useState(false);
 
   const char = state.character;
-  const disciplineMeta = char ? DISCIPLINE_META[char.discipline] : null;
-  const totalMinutes = state.userSkills.reduce((sum, s) => sum + s.totalMinutes, 0);
+  const totalMinutes = state.userDisciplines.reduce((sum, d) => sum + d.totalMinutes, 0);
   const overallLevel = getSkillLevel(totalMinutes);
   const overallProg = getSkillXPProgress(totalMinutes);
 
@@ -149,12 +148,13 @@ export default function Profile() {
               >
                 {char.name}
               </h2>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {disciplineMeta && (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {char.disciplines?.map(d => (
                   <span
+                    key={d}
                     className="font-display uppercase"
                     style={{
-                      fontSize: 8, letterSpacing: '0.14em',
+                      fontSize: 8, letterSpacing: '0.12em',
                       color: 'var(--fq-xp)',
                       background: 'rgba(212,168,75,0.1)',
                       border: '1px solid rgba(212,168,75,0.25)',
@@ -162,9 +162,9 @@ export default function Profile() {
                       padding: '2px 8px',
                     }}
                   >
-                    {disciplineMeta.label}
+                    {DISCIPLINE_META[d].label}
                   </span>
-                )}
+                ))}
                 <span
                   className="font-display uppercase"
                   style={{
@@ -198,7 +198,7 @@ export default function Profile() {
             {[
               { label: 'Focus Time', value: formatDuration(totalMinutes) },
               { label: 'Sessions', value: String(state.sessions.length) },
-              { label: 'Skills', value: String(state.userSkills.filter(s => s.isActive).length) },
+              { label: 'Disciplines', value: String(state.userDisciplines.length) },
             ].map((s, i, arr) => (
               <div
                 key={s.label}
@@ -297,7 +297,7 @@ export default function Profile() {
         className="font-serif italic text-center"
         style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}
       >
-        {disciplineMeta?.tagline || 'Your time. Your legend.'}
+        {char.disciplines?.[0] ? DISCIPLINE_META[char.disciplines[0]].tagline : 'Your time. Your legend.'}
       </p>
 
       {/* Reset Confirmation Modal */}
