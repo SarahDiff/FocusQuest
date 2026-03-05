@@ -257,6 +257,24 @@
     inset: -1px;
   }
 
+  /* FocusQuest ember particles */
+  @keyframes ember-rise {
+    0% {
+      transform: translateY(0) translateX(0) scale(1);
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translateY(-68vh) translateX(var(--ember-drift, 18px)) scale(0.25);
+      opacity: 0;
+    }
+  }
+
   /* FocusQuest XP Bar shimmer */
   .fq-xp-shimmer {
     position: absolute;

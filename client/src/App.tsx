@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NavBar from "@/components/nav-bar";
 import FQBackground from "@/components/fq-background";
+import EmberParticles from "@/components/ember-particles";
 import Onboarding from "@/pages/onboarding";
 import Home from "@/pages/home";
 import Session from "@/pages/session";
@@ -28,6 +29,7 @@ function AppInner() {
     return (
       <div className="min-h-screen relative">
         <FQBackground />
+        <EmberParticles />
         <Onboarding />
       </div>
     );
