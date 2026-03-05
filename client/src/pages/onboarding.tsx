@@ -20,7 +20,9 @@ const AVATAR_BEARINGS: { value: Bearing; label: string; glyph: string }[] = [
 ];
 
 const HAIR_OPTIONS = ['Raven Black', 'Tawny Brown', 'Amber Gold', 'Auburn Red', 'Ashen Blonde', 'Silver Grey'];
+const HAIR_LENGTH_OPTIONS = ['Cropped', 'Short', 'Shoulder', 'Long Straight', 'Long Wavy', 'Curly Short', 'Curly Long'];
 const SKIN_OPTIONS = ['Alabaster', 'Pale Rose', 'Sun-Kissed', 'Bronze', 'Copper', 'Ebony'];
+const EYE_COLOR_OPTIONS = ['Storm Grey', 'Forest Green', 'Ocean Blue', 'Amber', 'Onyx', 'Violet'];
 
 const DISCIPLINES: { value: Discipline; glyph: string }[] = [
   { value: 'scholar', glyph: '✦' },
@@ -92,7 +94,9 @@ export default function Onboarding() {
   const [bearing, setBearing] = useState<Bearing>('neutral');
   const [discipline, setDiscipline] = useState<Discipline | null>(null);
   const [hairIndex, setHairIndex] = useState(1);
+  const [hairLengthIndex, setHairLengthIndex] = useState(3);
   const [skinIndex, setSkinIndex] = useState(2);
+  const [eyeColorIndex, setEyeColorIndex] = useState(2);
 
   function next(to: Step) {
     setStep(to);
@@ -100,7 +104,7 @@ export default function Onboarding() {
 
   function finish() {
     if (!discipline) return;
-    completeOnboarding({ name: name.trim() || 'Traveller', discipline, bearing, hairIndex, skinIndex });
+    completeOnboarding({ name: name.trim() || 'Traveller', discipline, bearing, hairIndex, hairLengthIndex, skinIndex, eyeColorIndex });
     navigate('/');
   }
 
@@ -371,7 +375,7 @@ export default function Onboarding() {
         className="fq-scroll animate-fade-in"
       >
         {/* Character portrait */}
-        <div className="relative flex-shrink-0" style={{ height: 300 }}>
+        <div className="relative flex-shrink-0" style={{ height: 440 }}>
           <img
             src={characterImg}
             alt="Your Traveller"
@@ -415,8 +419,8 @@ export default function Onboarding() {
 
         {/* Content */}
         <div
-          className="flex-1"
-          style={{ paddingLeft: 24, paddingRight: 24, paddingBottom: 40 }}
+          className="flex-1 mx-auto w-full"
+          style={{ maxWidth: 340, paddingLeft: 24, paddingRight: 24, paddingBottom: 40 }}
         >
           {/* Heading */}
           <div className="text-center mb-2 mt-5">
@@ -438,7 +442,9 @@ export default function Onboarding() {
           <SectionDivider label="Appearance" />
 
           <SliderRow label="Hair" options={HAIR_OPTIONS} value={hairIndex} onChange={setHairIndex} />
+          <SliderRow label="Hair Length" options={HAIR_LENGTH_OPTIONS} value={hairLengthIndex} onChange={setHairLengthIndex} />
           <SliderRow label="Skin Tone" options={SKIN_OPTIONS} value={skinIndex} onChange={setSkinIndex} />
+          <SliderRow label="Eye Color" options={EYE_COLOR_OPTIONS} value={eyeColorIndex} onChange={setEyeColorIndex} />
 
           {/* BEARING section */}
           <SectionDivider label="Bearing" />

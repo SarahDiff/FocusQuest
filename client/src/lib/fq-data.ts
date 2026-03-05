@@ -11,7 +11,9 @@ export interface Character {
   discipline: Discipline;
   bearing: Bearing;
   hairIndex?: number;
+  hairLengthIndex?: number;
   skinIndex?: number;
+  eyeColorIndex?: number;
 }
 
 export interface SkillDef {
