@@ -1,16 +1,26 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, User } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
 import { type Bearing, type Discipline, DISCIPLINE_META } from "@/lib/fq-data";
+import characterImg from "@assets/ChatGPT_Image_Mar_5,_2026_at_08_15_07_PM_1772738146448.png";
 
-type Step = 'splash' | 'philosophy' | 'identity' | 'discipline' | 'quest';
+type Step = 'splash' | 'philosophy' | 'identity' | 'avatar' | 'discipline' | 'quest';
 
 const BEARINGS: { value: Bearing; label: string; glyph: string }[] = [
   { value: 'female', label: 'She / Her', glyph: '♀' },
   { value: 'neutral', label: 'They / Them', glyph: '◈' },
   { value: 'male', label: 'He / Him', glyph: '♂' },
 ];
+
+const AVATAR_BEARINGS: { value: Bearing; label: string; glyph: string }[] = [
+  { value: 'male', label: 'Male', glyph: '♂' },
+  { value: 'neutral', label: 'Neutral', glyph: '◈' },
+  { value: 'female', label: 'Female', glyph: '♀' },
+];
+
+const HAIR_OPTIONS = ['Raven Black', 'Tawny Brown', 'Amber Gold', 'Auburn Red', 'Ashen Blonde', 'Silver Grey'];
+const SKIN_OPTIONS = ['Alabaster', 'Pale Rose', 'Sun-Kissed', 'Bronze', 'Copper', 'Ebony'];
 
 const DISCIPLINES: { value: Discipline; glyph: string }[] = [
   { value: 'scholar', glyph: '✦' },
@@ -19,6 +29,61 @@ const DISCIPLINES: { value: Discipline; glyph: string }[] = [
   { value: 'adventurer', glyph: '◎' },
 ];
 
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3 my-5">
+      <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
+      <span
+        className="font-display uppercase"
+        style={{ fontSize: 8, letterSpacing: '0.22em', color: 'var(--fq-text-muted)' }}
+      >
+        {label}
+      </span>
+      <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
+    </div>
+  );
+}
+
+function SliderRow({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="mb-5">
+      <div className="flex justify-between items-baseline mb-3">
+        <span
+          className="font-display uppercase"
+          style={{ fontSize: 9, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}
+        >
+          {label}
+        </span>
+        <span
+          className="font-serif italic"
+          style={{ fontSize: 13, color: 'var(--fq-xp)', letterSpacing: '0.01em' }}
+        >
+          {options[value]}
+        </span>
+      </div>
+      <input
+        type="range"
+        className="fq-slider"
+        min={0}
+        max={options.length - 1}
+        value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        data-testid={`slider-${label.toLowerCase().replace(' ', '-')}`}
+      />
+    </div>
+  );
+}
+
 export default function Onboarding() {
   const { completeOnboarding } = useFQ();
   const [, navigate] = useLocation();
@@ -26,6 +91,8 @@ export default function Onboarding() {
   const [name, setName] = useState('');
   const [bearing, setBearing] = useState<Bearing>('neutral');
   const [discipline, setDiscipline] = useState<Discipline | null>(null);
+  const [hairIndex, setHairIndex] = useState(1);
+  const [skinIndex, setSkinIndex] = useState(2);
 
   function next(to: Step) {
     setStep(to);
@@ -33,7 +100,7 @@ export default function Onboarding() {
 
   function finish() {
     if (!discipline) return;
-    completeOnboarding({ name: name.trim() || 'Traveller', discipline, bearing });
+    completeOnboarding({ name: name.trim() || 'Traveller', discipline, bearing, hairIndex, skinIndex });
     navigate('/');
   }
 
@@ -232,7 +299,7 @@ export default function Onboarding() {
           </h2>
 
           {/* Name input */}
-          <div className="mb-8">
+          <div className="mb-10">
             <label
               className="font-display block mb-2"
               style={{ fontSize: 9, letterSpacing: '0.2em', color: 'var(--fq-text-muted)', textTransform: 'uppercase' }}
@@ -267,47 +334,8 @@ export default function Onboarding() {
             />
           </div>
 
-          {/* Bearing selection */}
-          <div className="mb-10">
-            <label
-              className="font-display block mb-3"
-              style={{ fontSize: 9, letterSpacing: '0.2em', color: 'var(--fq-text-muted)', textTransform: 'uppercase' }}
-            >
-              Bearing
-            </label>
-            <div className="flex gap-3">
-              {BEARINGS.map(b => (
-                <button
-                  key={b.value}
-                  onClick={() => setBearing(b.value)}
-                  className="flex-1 flex flex-col items-center gap-2 py-4 cursor-pointer transition-all duration-200 rounded-2xl"
-                  data-testid={`button-bearing-${b.value}`}
-                  style={{
-                    background: bearing === b.value ? 'rgba(94,196,192,0.1)' : 'var(--fq-surface)',
-                    border: `1.5px solid ${bearing === b.value ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
-                    outline: 'none',
-                    boxShadow: bearing === b.value ? '0 0 14px rgba(94,196,192,0.18)' : 'none',
-                  }}
-                >
-                  <span
-                    className="font-display"
-                    style={{ fontSize: 18, color: bearing === b.value ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}
-                  >
-                    {b.glyph}
-                  </span>
-                  <span
-                    className="font-display"
-                    style={{ fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: bearing === b.value ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}
-                  >
-                    {b.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           <button
-            onClick={() => next('discipline')}
+            onClick={() => next('avatar')}
             className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
             data-testid="button-identity-next"
             style={{
@@ -320,7 +348,232 @@ export default function Onboarding() {
               boxShadow: '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)',
             }}
           >
-            Choose Your Path <ChevronRight size={14} />
+            Shape Your Form <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Avatar ──────────────────────────────────────────
+  if (step === 'avatar') {
+    const displayName = name.trim() || 'Traveller';
+    const bearingLabel = AVATAR_BEARINGS.find(b => b.value === bearing)?.label || 'Neutral';
+
+    return (
+      <div
+        style={{
+          minHeight: '100svh',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          zIndex: 10,
+          overflowY: 'auto',
+        }}
+        className="fq-scroll animate-fade-in"
+      >
+        {/* Character portrait */}
+        <div className="relative flex-shrink-0" style={{ height: 300 }}>
+          <img
+            src={characterImg}
+            alt="Your Traveller"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center 10%',
+              display: 'block',
+            }}
+          />
+          {/* Gradient fade to background */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(15,19,24,0.25) 0%, rgba(15,19,24,0) 40%, rgba(15,19,24,0.85) 85%, #0f1318 100%)',
+            }}
+          />
+          {/* Left gradient fade */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to right, rgba(15,19,24,0.3) 0%, transparent 30%, transparent 70%, rgba(15,19,24,0.3) 100%)' }}
+          />
+          {/* Back button */}
+          <button
+            onClick={() => next('identity')}
+            className="absolute top-4 left-4 flex items-center gap-1 cursor-pointer"
+            style={{
+              background: 'rgba(15,19,24,0.6)',
+              border: '1px solid var(--fq-border)',
+              borderRadius: 999,
+              padding: '6px 14px',
+              color: 'var(--fq-text-muted)',
+              fontSize: 12,
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
+          {/* Name + bearing badge */}
+          <div
+            className="absolute bottom-5 left-0 right-0 flex justify-center"
+          >
+            <div
+              className="font-display uppercase"
+              style={{
+                fontSize: 9,
+                letterSpacing: '0.22em',
+                color: 'var(--fq-xp-bright)',
+                background: 'rgba(15,19,24,0.7)',
+                border: '1px solid rgba(212,168,75,0.35)',
+                borderRadius: 999,
+                padding: '5px 18px',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 0 12px rgba(212,168,75,0.15)',
+              }}
+            >
+              The {displayName} · {bearingLabel}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div
+          className="flex-1"
+          style={{ paddingLeft: 24, paddingRight: 24, paddingBottom: 40 }}
+        >
+          {/* Heading */}
+          <div className="text-center mb-2 mt-5">
+            <p
+              className="font-display uppercase mb-1"
+              style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.8 }}
+            >
+              Your Form
+            </p>
+            <h2
+              className="font-display font-bold"
+              style={{ fontSize: 22, color: 'var(--fq-text-primary)', letterSpacing: '0.03em' }}
+            >
+              Shape Your Traveller
+            </h2>
+          </div>
+
+          {/* APPEARANCE section */}
+          <SectionDivider label="Appearance" />
+
+          <SliderRow label="Hair" options={HAIR_OPTIONS} value={hairIndex} onChange={setHairIndex} />
+          <SliderRow label="Skin Tone" options={SKIN_OPTIONS} value={skinIndex} onChange={setSkinIndex} />
+
+          {/* BEARING section */}
+          <SectionDivider label="Bearing" />
+
+          <div className="flex gap-2 mb-2">
+            {AVATAR_BEARINGS.map(b => {
+              const selected = bearing === b.value;
+              return (
+                <button
+                  key={b.value}
+                  onClick={() => setBearing(b.value)}
+                  className="flex-1 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200 rounded-2xl"
+                  data-testid={`button-bearing-${b.value}`}
+                  style={{
+                    paddingTop: 16,
+                    paddingBottom: 16,
+                    background: selected ? 'rgba(212,168,75,0.1)' : 'var(--fq-surface)',
+                    border: `1.5px solid ${selected ? 'rgba(212,168,75,0.5)' : 'var(--fq-border)'}`,
+                    outline: 'none',
+                    boxShadow: selected ? '0 0 14px rgba(212,168,75,0.2)' : 'none',
+                  }}
+                >
+                  <span
+                    className="font-display"
+                    style={{ fontSize: 18, color: selected ? 'var(--fq-xp)' : 'var(--fq-text-muted)' }}
+                  >
+                    {b.glyph}
+                  </span>
+                  <span
+                    className="font-display uppercase"
+                    style={{ fontSize: 8, letterSpacing: '0.12em', color: selected ? 'var(--fq-xp-bright)' : 'var(--fq-text-muted)' }}
+                  >
+                    {b.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* OR divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
+            <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.22em', color: 'var(--fq-text-muted)' }}>or</span>
+            <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
+          </div>
+
+          {/* Forge from your likeness */}
+          <div
+            className="rounded-2xl mb-6 flex items-center gap-4"
+            style={{
+              border: '1.5px dashed rgba(212,168,75,0.25)',
+              padding: '18px 20px',
+              background: 'rgba(212,168,75,0.03)',
+            }}
+          >
+            <div
+              className="flex-shrink-0 flex items-center justify-center rounded-xl"
+              style={{
+                width: 48, height: 48,
+                background: 'rgba(212,168,75,0.08)',
+                border: '1px solid rgba(212,168,75,0.2)',
+              }}
+            >
+              <User size={20} style={{ color: 'var(--fq-xp)' }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p
+                className="font-display uppercase mb-1"
+                style={{ fontSize: 10, letterSpacing: '0.14em', color: 'var(--fq-xp-bright)' }}
+              >
+                Forge from your likeness
+              </p>
+              <p
+                className="font-serif italic mb-3"
+                style={{ fontSize: 12, color: 'var(--fq-text-muted)', lineHeight: 1.5 }}
+              >
+                Upload a photo and we'll craft a traveller in your image
+              </p>
+              <button
+                className="font-display uppercase cursor-pointer transition-all duration-150"
+                data-testid="button-ai-generation"
+                style={{
+                  fontSize: 8,
+                  letterSpacing: '0.18em',
+                  color: 'var(--fq-xp)',
+                  background: 'rgba(212,168,75,0.1)',
+                  border: '1px solid rgba(212,168,75,0.3)',
+                  borderRadius: 999,
+                  padding: '5px 14px',
+                }}
+              >
+                ✦ AI Generation
+              </button>
+            </div>
+          </div>
+
+          {/* Continue button */}
+          <button
+            onClick={() => next('discipline')}
+            className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
+            data-testid="button-avatar-next"
+            style={{
+              background: 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)',
+              border: '1.5px solid var(--fq-border-teal)',
+              color: 'var(--fq-teal-bright)',
+              borderRadius: 999,
+              padding: '15px 36px',
+              fontSize: 11,
+              boxShadow: '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            Choose Your Path <ChevronDown size={14} />
           </button>
         </div>
       </div>
@@ -333,7 +586,7 @@ export default function Onboarding() {
       <div style={{ ...containerStyle, justifyContent: 'flex-start', paddingTop: 56 }}>
         <div className="w-full max-w-[380px] animate-fade-in">
           <button
-            onClick={() => next('identity')}
+            onClick={() => next('avatar')}
             className="flex items-center gap-1 mb-8 cursor-pointer"
             style={{ background: 'none', border: 'none', color: 'var(--fq-text-muted)', fontSize: 12 }}
           >

@@ -10,6 +10,8 @@ export interface Character {
   name: string;
   discipline: Discipline;
   bearing: Bearing;
+  hairIndex?: number;
+  skinIndex?: number;
 }
 
 export interface SkillDef {
