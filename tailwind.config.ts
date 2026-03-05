@@ -74,7 +74,7 @@ export default {
           moon: "#a8c4e8",
           "text-primary": "#e2eaf4",
           "text-body": "#96a8bc",
-          "text-muted": "#4e6070",
+          "text-muted": "#7a96aa",
           "text-ghost": "#242e3a",
           danger: "#8a4050",
         },

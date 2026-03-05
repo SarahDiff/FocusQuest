@@ -35,7 +35,7 @@
   --secondary: 215 18% 14%;
   --secondary-foreground: 212 47% 92%;
   --muted: 215 18% 13%;
-  --muted-foreground: 210 18% 44%;
+  --muted-foreground: 210 22% 58%;
   --accent: 215 18% 14%;
   --accent-foreground: 212 47% 92%;
   --destructive: 350 37% 38%;
@@ -98,7 +98,7 @@
   --fq-moon: #a8c4e8;
   --fq-text-primary: #e2eaf4;
   --fq-text-body: #96a8bc;
-  --fq-text-muted: #4e6070;
+  --fq-text-muted: #7a96aa;
   --fq-text-ghost: #242e3a;
   --fq-border: rgba(180,210,240,0.10);
   --fq-border-mid: rgba(180,210,240,0.22);
@@ -138,7 +138,7 @@
   --secondary: 215 18% 14%;
   --secondary-foreground: 212 47% 92%;
   --muted: 215 18% 13%;
-  --muted-foreground: 210 18% 44%;
+  --muted-foreground: 210 22% 58%;
   --accent: 215 18% 14%;
   --accent-foreground: 212 47% 92%;
   --destructive: 350 37% 38%;

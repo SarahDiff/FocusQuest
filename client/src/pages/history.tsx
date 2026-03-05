@@ -154,7 +154,7 @@ function Heatmap() {
                 className="font-display"
                 style={{
                   fontSize: 8,
-                  color: isToday ? 'var(--fq-teal)' : mins > 0 ? 'var(--fq-text-body)' : 'var(--fq-text-ghost)',
+                  color: isToday ? 'var(--fq-teal)' : mins > 0 ? 'var(--fq-text-body)' : 'var(--fq-text-muted)',
                   letterSpacing: '0.04em',
                 }}
               >

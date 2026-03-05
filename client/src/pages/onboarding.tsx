@@ -43,7 +43,10 @@ export default function Onboarding() {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '32px 24px',
+    paddingTop: 32,
+    paddingBottom: 32,
+    paddingLeft: 24,
+    paddingRight: 24,
     position: 'relative',
     zIndex: 10,
   };
@@ -415,7 +418,7 @@ export default function Onboarding() {
                 ? 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)'
                 : 'rgba(255,255,255,0.03)',
               border: `1.5px solid ${discipline ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
-              color: discipline ? 'var(--fq-teal-bright)' : 'var(--fq-text-ghost)',
+              color: discipline ? 'var(--fq-teal-bright)' : 'var(--fq-text-muted)',
               borderRadius: 999,
               padding: '15px 36px',
               fontSize: 11,

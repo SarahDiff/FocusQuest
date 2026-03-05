@@ -283,7 +283,7 @@ export default function Profile() {
       >
         <p
           className="font-display uppercase pt-5 mb-2"
-          style={{ fontSize: 9, letterSpacing: '0.26em', color: 'rgba(138,64,80,0.7)' }}
+          style={{ fontSize: 9, letterSpacing: '0.26em', color: '#c47080' }}
         >
           Realm
         </p>
