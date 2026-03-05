@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FocusQuest · Design System v3 · Moonlight + Gold</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — MOONLIGHT EDITION
+═══════════════════════════════════════════════ */
+:root {
+  /* — Backgrounds — deep cool night, hint of blue-grey in the dark */
+  --bg-base:       #0f1318;   /* deepest — app shell. Cool blue-black */
+  --bg-depth:      #090c10;   /* deeper, modal underlay */
+  --bg-surface:    rgba(16, 22, 32, 0.78);  /* frosted card — cool tint */
+  --bg-surface-hi: rgba(20, 28, 40, 0.86);  /* hover / active surface */
+  --bg-inset:      rgba(8, 12, 18, 0.65);   /* inputs, inset wells */
+
+  /* — Frost — */
+  --frost-subtle:  rgba(14, 20, 30, 0.74);  /* card frost */
+  --frost-deep:    rgba(8, 14, 22, 0.88);   /* nav, modals */
+
+  /* — Moonsilver (replaces gold — cooler, more silver-touched) — */
+  --silver:        #c8d4e0;   /* primary accent — pale moonlight silver */
+  --silver-bright: #ddeaf5;   /* hover / highlight */
+  --silver-dim:    #5a6878;   /* subdued / disabled */
+  --silver-glow:   rgba(180, 210, 240, 0.12);
+  --silver-glow-lg:rgba(180, 210, 240, 0.22);
+
+  /* — Teal / Aqua — the magical, living accent — */
+  --teal:          #5ec4c0;   /* XP bars, active states, progress */
+  --teal-bright:   #7ddbd7;   /* glow highlight */
+  --teal-dim:      #2a5c5a;   /* subdued teal */
+  --teal-glow:     rgba(94, 196, 192, 0.18);
+  --teal-glow-lg:  rgba(94, 196, 192, 0.30);
+
+  /* — XP Gold — warm alchemical contrast against the cool palette — */
+  --xp:            #d4a84b;   /* XP bar fill — warm burnished gold */
+  --xp-bright:     #ecc96a;   /* bar highlight / shimmer peak */
+  --xp-dim:        #6b4e18;   /* bar start / deep shadow end */
+  --xp-glow:       rgba(212, 168, 75, 0.22);
+  --xp-glow-lg:    rgba(212, 168, 75, 0.38);
+
+  /* — Moonbeam — secondary ethereal accent — */
+  --moon:          #a8c4e8;   /* soft blue — secondary labels, inactive */
+  --moon-dim:      rgba(168, 196, 232, 0.15);
+
+  /* — Text — */
+  --text-primary:  #e2eaf4;   /* headings — cool near-white */
+  --text-body:     #96a8bc;   /* body — cool blue-grey */
+  --text-muted:    #4e6070;   /* muted — deep blue-grey */
+  --text-ghost:    #242e3a;   /* barely visible */
+
+  /* — Semantic — */
+  --danger:        #8a4050;
+  --danger-dim:    rgba(138,64,80,0.2);
+
+  /* — Borders — */
+  --border:        rgba(180,210,240,0.10);
+  --border-mid:    rgba(180,210,240,0.22);
+  --border-strong: rgba(180,210,240,0.44);
+  --border-teal:   rgba(94,196,192,0.35);
+
+  /* — Radius — */
+  --r-sm:   8px;
+  --r-md:   14px;
+  --r-lg:   20px;
+  --r-xl:   28px;
+  --r-pill: 999px;
+
+  /* — Shadows — */
+  --shadow-card: 0 4px 28px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.03) inset;
+  --shadow-teal: 0 0 24px var(--teal-glow), 0 4px 20px rgba(0,0,0,0.5);
+  --shadow-moon: 0 0 20px var(--silver-glow), 0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* ═══════════════════════════════════════════════
+   DOC SHELL
+═══════════════════════════════════════════════ */
+body {
+  background: #07090d;
+  color: var(--text-primary);
+  font-family: 'EB Garamond', Georgia, serif;
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+/* Simulated cool moonlit background — placeholder for Figma bg */
+.bg-sim {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(40,70,110,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 60% at 80% 70%, rgba(30,60,90,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 40% at 50% 0%,  rgba(80,130,180,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 100%,rgba(20,45,70,0.15) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.doc-wrap { position: relative; z-index: 1; }
+
+/* ── DOC HEADER ── */
+.doc-header {
+  background: rgba(7,9,13,0.96);
+  border-bottom: 1px solid var(--border);
+  padding: 22px 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(16px);
+}
+.doc-wordmark {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: var(--teal);
+  font-weight: 600;
+  text-shadow: 0 0 20px var(--teal-glow);
+}
+.doc-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+.doc-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--text-ghost);
+}
+
+/* ── SECTION ── */
+.section {
+  padding: 56px 48px 0;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.section + .section { padding-top: 64px; }
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--teal);
+  opacity: 0.65;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.section-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  margin-bottom: 32px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── GRIDS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+/* ── TOKEN LABELS ── */
+.token-name {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: block;
+}
+.comp-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  color: var(--text-ghost);
+  text-transform: uppercase;
+  padding-left: 1px;
+}
+.comp-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+/* ══════════════════════════════════════════
+   §1  COLOUR SWATCHES
+══════════════════════════════════════════ */
+.swatch-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.swatch {
+  display: flex; flex-direction: column;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.05);
+  min-width: 96px; flex: 1;
+}
+.swatch-chip { height: 56px; width: 100%; }
+.swatch-info { background: rgba(255,255,255,0.02); padding: 8px 10px; }
+.swatch-info .name { font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.12em; color:var(--text-muted); display:block; margin-bottom:2px; }
+.swatch-info .hex  { font-size:10px; color:var(--text-ghost); font-style:italic; }
+
+/* ══════════════════════════════════════════
+   §2  TYPOGRAPHY
+══════════════════════════════════════════ */
+.type-specimen { display: flex; flex-direction: column; gap: 0; }
+.type-row {
+  display: flex; align-items: baseline; gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--text-ghost);
+}
+.type-row:last-child { border-bottom: none; }
+.type-meta { width: 140px; flex-shrink: 0; }
+.type-meta .role { font-family:'Cinzel',serif; font-size:8.5px; letter-spacing:0.16em; color:var(--text-muted); display:block; margin-bottom:3px; }
+.type-meta .spec { font-size:10px; color:var(--text-ghost); font-style:italic; line-height:1.5; }
+.type-sample { flex: 1; }
+
+.t-display  { font-family:'Cinzel',serif; font-size:36px; font-weight:700; color:var(--text-primary); letter-spacing:0.03em; line-height:1.1; }
+.t-h1       { font-family:'Cinzel',serif; font-size:26px; font-weight:700; color:var(--text-primary); letter-spacing:0.02em; line-height:1.2; }
+.t-h2       { font-family:'Cinzel',serif; font-size:20px; font-weight:600; color:var(--text-primary); letter-spacing:0.04em; }
+.t-h3       { font-family:'Cinzel',serif; font-size:15px; font-weight:500; color:var(--text-primary); letter-spacing:0.06em; }
+.t-label    { font-family:'Cinzel',serif; font-size:10px; font-weight:400; color:var(--text-muted); letter-spacing:0.22em; text-transform:uppercase; }
+.t-eyebrow  { font-family:'Cinzel',serif; font-size:9px; font-weight:400; color:var(--teal); letter-spacing:0.28em; text-transform:uppercase; opacity:0.85; }
+.t-body     { font-family:'EB Garamond',serif; font-size:16px; color:var(--text-body); line-height:1.65; }
+.t-italic   { font-family:'EB Garamond',serif; font-size:15px; font-style:italic; color:var(--text-body); line-height:1.6; }
+.t-caption  { font-family:'EB Garamond',serif; font-size:12px; color:var(--text-muted); font-style:italic; }
+.t-teal     { font-family:'Cinzel',serif; font-size:13px; color:var(--teal); letter-spacing:0.1em; text-shadow:0 0 16px var(--teal-glow); }
+.t-silver   { font-family:'Cinzel',serif; font-size:13px; color:var(--silver); letter-spacing:0.1em; }
+.t-number   { font-family:'Cinzel',serif; font-size:48px; font-weight:700; color:var(--text-primary); letter-spacing:0.04em; line-height:1; }
+.t-moon     { font-family:'EB Garamond',serif; font-size:15px; font-style:italic; color:var(--moon); }
+
+/* ══════════════════════════════════════════
+   CARD BASE
+══════════════════════════════════════════ */
+.card {
+  background: var(--frost-subtle);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(180,210,240,0.08) 40%, transparent);
+}
+
+/* Character card — slightly warmer/different from plain frost */
+.char-card {
+  background: linear-gradient(145deg, rgba(14,20,32,0.95) 0%, rgba(8,13,22,0.98) 100%);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.char-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94,196,192,0.2) 50%, transparent);
+}
+/* Subtle moon-glow corner */
+.char-card::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(94,196,192,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Modal */
+.modal-demo {
+  background: var(--frost-deep);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.7);
+}
+.modal-header {
+  background: rgba(0,0,0,0.25);
+  padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════ */
+.btn {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.12em;
+  border-radius: var(--r-pill);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: rgba(255,255,255,0);
+  transition: background 0.2s;
+}
+.btn:hover::after { background: rgba(255,255,255,0.04); }
+
+/* Primary — teal glow */
+.btn-primary {
+  background: linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%);
+  border: 1.5px solid var(--border-teal);
+  color: var(--teal-bright);
+  font-size: 11px;
+  padding: 13px 28px;
+  box-shadow: 0 0 20px var(--teal-glow), 0 2px 8px rgba(0,0,0,0.5);
+  text-shadow: 0 0 12px var(--teal-glow-lg);
+}
+.btn-primary:hover {
+  box-shadow: 0 0 32px var(--teal-glow-lg), 0 2px 8px rgba(0,0,0,0.5);
+  border-color: var(--teal);
+}
+
+/* Secondary */
+.btn-secondary {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-mid);
+  color: var(--text-body);
+  font-size: 10.5px;
+  padding: 11px 22px;
+}
+.btn-secondary:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+/* Ghost */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--text-ghost);
+  color: var(--text-muted);
+  font-size: 10px;
+  padding: 9px 18px;
+}
+.btn-ghost:hover { border-color: var(--border-mid); color: var(--text-body); }
+
+/* Danger */
+.btn-danger {
+  background: var(--danger-dim);
+  border: 1px solid rgba(138,64,80,0.4);
+  color: #c47080;
+  font-size: 10.5px;
+  padding: 11px 22px;
+}
+
+/* Icon */
+.btn-icon {
+  width: 44px; height: 44px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-mid);
+  border-radius: 50%;
+  color: var(--teal);
+  font-size: 16px;
+  padding: 0;
+}
+
+.btn-lg { font-size: 12px; padding: 15px 36px; }
+.btn-sm { font-size: 9.5px; padding: 8px 16px; }
+
+/* ══════════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════════ */
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--text-muted); text-transform: uppercase;
+}
+.fq-input {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.fq-input::placeholder { color: var(--text-muted); font-style: italic; }
+.fq-input:focus {
+  border-color: var(--border-teal);
+  box-shadow: 0 0 0 3px var(--teal-glow);
+}
+
+/* ── TOGGLE ── */
+.toggle-wrap { display: flex; align-items: center; gap: 12px; }
+.toggle-track {
+  width: 38px; height: 22px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  position: relative; cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+  flex-shrink: 0;
+}
+.toggle-track.on {
+  background: rgba(94,196,192,0.2);
+  border-color: var(--border-teal);
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: left 0.25s, background 0.25s;
+}
+.toggle-track.on .toggle-thumb { left: 19px; background: var(--teal); box-shadow: 0 0 8px var(--teal-glow); }
+.toggle-label { font-size: 13px; color: var(--text-body); }
+
+/* ── SLIDER ── */
+.fq-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 3px;
+  border-radius: 2px; outline: none; cursor: pointer;
+}
+.fq-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--bg-base);
+  border: 1.5px solid var(--silver);
+  box-shadow: 0 0 8px var(--silver-glow);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.fq-slider::-webkit-slider-thumb:hover { box-shadow: 0 0 14px var(--silver-glow-lg); }
+
+/* ══════════════════════════════════════════
+   XP BARS
+══════════════════════════════════════════ */
+.xp-bar-wrap { display: flex; flex-direction: column; gap: 5px; }
+.xp-bar-meta { display: flex; justify-content: space-between; align-items: baseline; }
+.xp-bar-track {
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px; overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--xp-dim), var(--xp), var(--xp-bright));
+  position: relative;
+  box-shadow: 0 0 10px var(--xp-glow), 0 0 3px var(--xp-glow-lg);
+  transition: width 0.6s ease;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 3.5s infinite 0.8s;
+}
+@keyframes shimmer { 0%{left:-60%} 100%{left:130%} }
+
+.w-78 { width: 78%; }
+.w-62 { width: 62%; }
+.w-45 { width: 45%; }
+.w-30 { width: 30%; }
+.w-90 { width: 90%; }
+
+/* ══════════════════════════════════════════
+   SKILL CHIP
+══════════════════════════════════════════ */
+.skill-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 6px 12px 6px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px; letter-spacing: 0.08em;
+  color: var(--text-body);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.skill-chip:hover { border-color: var(--border-teal); box-shadow: 0 0 10px var(--teal-glow); }
+.skill-chip .lvl { color: var(--teal); }
+.skill-chip-icon {
+  width: 22px; height: 22px;
+  background: rgba(94,196,192,0.07);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+/* ══════════════════════════════════════════
+   BADGES
+══════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: var(--r-sm);
+  padding: 3px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px; letter-spacing: 0.1em;
+}
+.badge-teal   { background: rgba(94,196,192,0.1);  border:1px solid rgba(94,196,192,0.3); color:var(--teal); }
+.badge-silver { background: rgba(200,212,224,0.08); border:1px solid rgba(200,212,224,0.2); color:var(--silver); }
+.badge-moon   { background: var(--moon-dim); border:1px solid rgba(168,196,232,0.2); color:var(--moon); }
+.badge-muted  { background: rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text-muted); }
+.badge-danger { background: var(--danger-dim); border:1px solid rgba(138,64,80,0.35); color:#c47080; }
+
+/* ══════════════════════════════════════════
+   DIVIDER
+══════════════════════════════════════════ */
+.fq-divider { display: flex; align-items: center; gap: 12px; margin: 4px 0; }
+.fq-divider-line { flex:1; height:1px; background:var(--text-ghost); opacity:0.5; }
+.fq-divider-text { font-family:'Cinzel',serif; font-size:8.5px; letter-spacing:0.2em; color:var(--text-ghost); text-transform:uppercase; }
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════ */
+.nav-bar {
+  background: var(--frost-deep);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 10px 0 18px;
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  cursor: pointer; padding: 4px 0;
+}
+.nav-item-icon { font-size: 18px; line-height: 1; }
+.nav-item-label { font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.1em; color:var(--text-muted); }
+.nav-item.active .nav-item-label { color: var(--teal); }
+.nav-item.active .nav-item-icon { filter: drop-shadow(0 0 6px rgba(94,196,192,0.6)); }
+
+/* ══════════════════════════════════════════
+   SKILL LIST ITEM
+══════════════════════════════════════════ */
+.skill-list-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.skill-list-item:last-child { border-bottom: none; }
+.skill-icon-box {
+  width: 38px; height: 38px;
+  background: rgba(94,196,192,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.skill-item-meta { flex: 1; }
+.skill-item-name-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+
+/* ══════════════════════════════════════════
+   SESSION LOG
+══════════════════════════════════════════ */
+.log-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  border-left: 2.5px solid var(--xp);
+}
+.log-item-meta { flex: 1; }
+.log-item-xp { font-family:'Cinzel',serif; font-size:11px; color:var(--xp-bright); text-shadow:0 0 10px var(--xp-glow); }
+
+/* ══════════════════════════════════════════
+   FOCUS TIMER RING
+══════════════════════════════════════════ */
+.timer-ring-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; padding: 28px 20px 22px;
+}
+.timer-ring {
+  width: 160px; height: 160px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.timer-ring svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.timer-track  { fill:none; stroke:rgba(255,255,255,0.04); stroke-width:2.5; }
+.timer-fill   { fill:none; stroke:var(--xp); stroke-width:2.5;
+  stroke-dasharray:440; stroke-dashoffset:155; stroke-linecap:round;
+  filter:drop-shadow(0 0 6px rgba(212,168,75,0.55)); }
+.timer-outer  { fill:none; stroke:rgba(180,210,240,0.07); stroke-width:0.8; stroke-dasharray:3 9; }
+.timer-number { font-family:'Cinzel',serif; font-size:38px; font-weight:700;
+  color:var(--text-primary); letter-spacing:0.04em; line-height:1;
+  position:relative; z-index:1; }
+.timer-sub { font-family:'EB Garamond',serif; font-size:13px; font-style:italic;
+  color:var(--text-muted); margin-top:5px; position:relative; z-index:1; }
+
+/* ══════════════════════════════════════════
+   SPACING DISPLAY
+══════════════════════════════════════════ */
+.space-demo { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+.space-chip { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.space-bar  { background:rgba(94,196,192,0.18); border-radius:2px; width:32px; }
+.space-num  { font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.1em; color:var(--text-muted); }
+
+/* ══════════════════════════════════════════
+   ICON GRID
+══════════════════════════════════════════ */
+.icon-grid { display:flex; flex-wrap:wrap; gap:10px; }
+.icon-item { display:flex; flex-direction:column; align-items:center; gap:6px; width:64px; }
+.icon-box {
+  width:44px; height:44px;
+  background:var(--bg-surface); border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.icon-name { font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:0.1em; color:var(--text-ghost); text-align:center; }
+
+/* ══════════════════════════════════════════
+   FIGMA NOTE
+══════════════════════════════════════════ */
+.figma-note {
+  background: rgba(94,196,192,0.04);
+  border: 1px dashed rgba(94,196,192,0.18);
+  border-radius: var(--r-md);
+  padding: 14px 18px; margin-top: 20px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.figma-note-icon { font-size:15px; flex-shrink:0; margin-top:2px; color:var(--teal); opacity:0.6; }
+.figma-note-text { font-size:13px; color:var(--text-muted); font-style:italic; line-height:1.55; }
+.figma-note-text strong { font-style:normal; font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.1em; color:var(--teal); display:block; margin-bottom:3px; opacity:0.8; }
+
+/* ══════════════════════════════════════════
+   COMPARISON CALLOUT (new — for this doc)
+══════════════════════════════════════════ */
+.compare-banner {
+  background: linear-gradient(135deg, rgba(14,20,32,0.9), rgba(8,14,24,0.95));
+  border: 1px solid var(--border-mid);
+  border-top: 2px solid var(--teal);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  padding: 16px 20px;
+  margin-bottom: 40px;
+  display: flex; gap: 32px; flex-wrap: wrap;
+}
+.compare-col { flex: 1; min-width: 200px; }
+.compare-col-title { font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.18em; margin-bottom:8px; text-transform:uppercase; }
+.compare-item { font-size:13px; color:var(--text-body); padding:3px 0; font-style:italic; border-bottom:1px solid var(--text-ghost); }
+.compare-item:last-child { border-bottom:none; }
+
+/* responsive */
+@media (max-width: 900px) {
+  .doc-header { padding:18px 24px; }
+  .section { padding:40px 24px 0; }
+  .grid-3, .grid-4 { grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
+  .type-row { flex-direction:column; gap:8px; }
+  .type-meta { width:auto; }
+}
+</style>
+</head>
+<body>
+<div class="bg-sim"></div>
+<div class="doc-wrap">
+
+<!-- ══ HEADER ══ -->
+<header class="doc-header">
+  <div>
+    <div class="doc-wordmark">◈ FOCUSQUEST</div>
+    <div class="doc-meta">Design System v3 · Moonlight + Gold · Teal UI / Gold XP</div>
+  </div>
+  <div class="doc-badge">CINZEL + EB GARAMOND</div>
+</header>
+
+
+<!-- ══════════════════════════════════════
+  COMPARE BANNER
+══════════════════════════════════════ -->
+<div class="section" style="padding-top:40px;">
+  <div class="compare-banner">
+    <div class="compare-col">
+      <div class="compare-col-title" style="color:var(--silver);">v1 — Forest (warm)</div>
+      <div class="compare-item">Accent: Gold #c4a45a</div>
+      <div class="compare-item">XP bars: Sage green</div>
+      <div class="compare-item">Bg base: #121916 (warm green-black)</div>
+      <div class="compare-item">Glow: Warm amber</div>
+      <div class="compare-item">Mood: Grounded, ancient, masculine-leaning</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-title" style="color:var(--teal);">v3 — Moonlight + Gold ← this doc</div>
+      <div class="compare-item">Teal: UI chrome, CTAs, active states, nav</div>
+      <div class="compare-item">Gold: XP bars, timer ring, session log XP</div>
+      <div class="compare-item">Moonsilver: structural borders, labels</div>
+      <div class="compare-item">Mood: Ethereal moonlight + alchemical warmth</div>
+      <div class="compare-item">The two accents never compete — they each own a domain</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-title" style="color:var(--text-muted);">What stays the same</div>
+      <div class="compare-item">Cinzel + EB Garamond type system</div>
+      <div class="compare-item">Subtle frost surfaces (backdrop-filter)</div>
+      <div class="compare-item">All spacing & radius tokens</div>
+      <div class="compare-item">Component shapes & layout patterns</div>
+      <div class="compare-item">Voice & copy principles</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §1  COLOUR
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">01</div>
+  <div class="section-heading">Colour Tokens — Moonlight</div>
+
+  <div style="margin-bottom:10px;"><span class="token-name">Backgrounds — Cool Blue-Black</span></div>
+  <div class="swatch-row" style="margin-bottom:28px;">
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#0f1318"></div>
+      <div class="swatch-info"><span class="name">BG BASE</span><span class="hex">#0f1318 — app shell</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#090c10"></div>
+      <div class="swatch-info"><span class="name">BG DEPTH</span><span class="hex">#090c10 — modals</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:rgba(16,22,32,0.78);border:1px dashed rgba(255,255,255,0.06)"></div>
+      <div class="swatch-info"><span class="name">SURFACE</span><span class="hex">rgba(16,22,32,.78) — cards</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:rgba(8,12,18,0.65);border:1px dashed rgba(255,255,255,0.06)"></div>
+      <div class="swatch-info"><span class="name">INSET</span><span class="hex">rgba(8,12,18,.65) — inputs</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:rgba(8,14,22,0.88);border:1px dashed rgba(255,255,255,0.06)"></div>
+      <div class="swatch-info"><span class="name">FROST DEEP</span><span class="hex">rgba(8,14,22,.88) — nav</span></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;"><span class="token-name">XP Gold — Progress & Achievement</span></div>
+  <div class="swatch-row" style="margin-bottom:28px;">
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#d4a84b;box-shadow:0 0 20px rgba(212,168,75,0.45)"></div>
+      <div class="swatch-info"><span class="name">XP</span><span class="hex">#d4a84b — bar fill, timer ring</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#ecc96a"></div>
+      <div class="swatch-info"><span class="name">XP BRIGHT</span><span class="hex">#ecc96a — shimmer peak, XP labels</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#6b4e18"></div>
+      <div class="swatch-info"><span class="name">XP DIM</span><span class="hex">#6b4e18 — bar shadow start</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:rgba(212,168,75,0.22);border:1px dashed rgba(255,255,255,0.06)"></div>
+      <div class="swatch-info"><span class="name">XP GLOW</span><span class="hex">rgba(212,168,75,.22) — bar glow</span></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;"><span class="token-name">Teal — UI Chrome & Active States</span></div>
+  <div class="swatch-row" style="margin-bottom:28px;">
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#5ec4c0;box-shadow:0 0 20px rgba(94,196,192,0.4)"></div>
+      <div class="swatch-info"><span class="name">TEAL</span><span class="hex">#5ec4c0 — primary magical accent</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#7ddbd7"></div>
+      <div class="swatch-info"><span class="name">TEAL BRIGHT</span><span class="hex">#7ddbd7 — hover / glow peak</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#2a5c5a"></div>
+      <div class="swatch-info"><span class="name">TEAL DIM</span><span class="hex">#2a5c5a — bar start / disabled</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#c8d4e0"></div>
+      <div class="swatch-info"><span class="name">MOONSILVER</span><span class="hex">#c8d4e0 — secondary accent</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#a8c4e8"></div>
+      <div class="swatch-info"><span class="name">MOONBEAM</span><span class="hex">#a8c4e8 — soft blue labels</span></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;"><span class="token-name">Text — Cool Scale</span></div>
+  <div class="swatch-row" style="margin-bottom:0;">
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#e2eaf4"></div>
+      <div class="swatch-info"><span class="name">TEXT PRIMARY</span><span class="hex">#e2eaf4 — headings</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#96a8bc"></div>
+      <div class="swatch-info"><span class="name">TEXT BODY</span><span class="hex">#96a8bc — body copy</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#4e6070"></div>
+      <div class="swatch-info"><span class="name">TEXT MUTED</span><span class="hex">#4e6070 — labels, hints</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#242e3a"></div>
+      <div class="swatch-info"><span class="name">TEXT GHOST</span><span class="hex">#242e3a — dividers, deco</span></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#8a4050"></div>
+      <div class="swatch-info"><span class="name">DANGER</span><span class="hex">#8a4050 — end session</span></div>
+    </div>
+  </div>
+
+  <div class="figma-note">
+    <div class="figma-note-icon">◈</div>
+    <div class="figma-note-text">
+      <strong>THE TWO-ACCENT RULE — TEAL vs GOLD</strong>
+      Each accent owns a distinct domain and they never swap. Teal (#5ec4c0) = the UI world — navigation, CTAs, active states, focus mode chrome, interactive elements. Gold (#d4a84b) = earned progress — XP bars, the timer ring, session log XP labels, level-up moments. The logic is intentional: teal is the realm you move through, gold is the treasure you accumulate. Together against the cool blue-black they read as moonlight + firelight — ethereal but warm at the point of achievement.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §2  TYPOGRAPHY
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">02</div>
+  <div class="section-heading">Typography Scale</div>
+
+  <div class="type-specimen">
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Display</span><span class="spec">Cinzel 700 · 36px · ls +0.03em</span></div>
+      <div class="type-sample"><div class="t-display">Your Legend</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Heading 1</span><span class="spec">Cinzel 700 · 26px · ls +0.02em</span></div>
+      <div class="type-sample"><div class="t-h1">Begin Your Quest</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Heading 2</span><span class="spec">Cinzel 600 · 20px · ls +0.04em</span></div>
+      <div class="type-sample"><div class="t-h2">Skills & Progress</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Heading 3</span><span class="spec">Cinzel 500 · 15px · ls +0.06em</span></div>
+      <div class="type-sample"><div class="t-h3">Reading — Lv 5</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Eyebrow</span><span class="spec">Cinzel 400 · 9px · teal · ls +0.28em</span></div>
+      <div class="type-sample"><div class="t-eyebrow">Your Path</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Label / UI</span><span class="spec">Cinzel 400 · 10px · muted · caps</span></div>
+      <div class="type-sample"><div class="t-label">Active Skills</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Body</span><span class="spec">EB Garamond 400 · 16px · 1.65lh</span></div>
+      <div class="type-sample"><div class="t-body">Every hour in true focus becomes part of who you are. Not a streak. Not a score. A self.</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Body Italic</span><span class="spec">EB Garamond 400i · 15px · body</span></div>
+      <div class="type-sample"><div class="t-italic">Your session is running quietly in the background.</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Moon Italic</span><span class="spec">EB Garamond 400i · 15px · moonbeam — ambient copy</span></div>
+      <div class="type-sample"><div class="t-moon">The realm stirs as you work.</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Caption</span><span class="spec">EB Garamond 400i · 12px · muted</span></div>
+      <div class="type-sample"><div class="t-caption">You can adjust this anytime in Settings</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Timer / Number</span><span class="spec">Cinzel 700 · 48px · ls +0.04em</span></div>
+      <div class="type-sample"><div class="t-number">1:24:08</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Teal Accent</span><span class="spec">Cinzel 400 · 13px · teal + glow</span></div>
+      <div class="type-sample"><div class="t-teal">+504 XP Earned</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><span class="role">Silver Accent</span><span class="spec">Cinzel 400 · 13px · moonsilver</span></div>
+      <div class="type-sample"><div class="t-silver">Scholar · Level 7</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §3  SURFACES
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">03</div>
+  <div class="section-heading">Surface & Elevation</div>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="comp-wrap">
+      <span class="comp-label">Card — Default (frost)</span>
+      <div class="card" style="min-height:110px;">
+        <div class="t-eyebrow" style="margin-bottom:6px;">Active Skills</div>
+        <div class="t-h3">Reading</div>
+        <div class="t-caption" style="margin-top:5px;">rgba(16,22,32,.78) · blur(14px) — background bleeds faintly</div>
+      </div>
+    </div>
+    <div class="comp-wrap">
+      <span class="comp-label">Card — Character (dark gradient)</span>
+      <div class="char-card" style="min-height:110px;">
+        <div class="t-eyebrow" style="margin-bottom:6px;color:var(--teal);">Scholar · Lv 7</div>
+        <div class="t-h3">Aelindra</div>
+        <div class="t-caption" style="margin-top:5px;">Opaque cool gradient · teal top border glow</div>
+      </div>
+    </div>
+    <div class="comp-wrap">
+      <span class="comp-label">Modal / Bottom Sheet</span>
+      <div class="modal-demo">
+        <div class="modal-header">
+          <span class="t-h3">Quest Complete</span>
+          <span style="color:var(--text-muted);font-size:16px;">✕</span>
+        </div>
+        <div style="padding:16px 20px;">
+          <div class="t-italic">Heavy frost · blur(20px) · world recedes behind celebration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figma-note">
+    <div class="figma-note-icon">◈</div>
+    <div class="figma-note-text">
+      <strong>SURFACE TINT SHIFT FROM V1</strong>
+      In v1, surfaces had a warm green tint. Here every surface leans cool blue — rgba(16,22,32) rather than rgba(22,30,24). This is subtle but critical: it means your painted background (whatever cool moonlit scene you create in Figma) will feel continuous with the UI rather than fighting it. The character card's teal top-border glow is new — it acts as a horizon line, like moonlight cresting over a ridge.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §4  COMPONENTS
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">04</div>
+  <div class="section-heading">Components</div>
+
+  <div class="grid-2" style="gap:40px;">
+
+    <!-- Buttons -->
+    <div class="comp-wrap" style="gap:14px;">
+      <span class="comp-label">Buttons</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;">
+        <div>
+          <span class="comp-label" style="margin-bottom:7px;display:block;">Primary — teal glow CTA</span>
+          <button class="btn btn-primary btn-lg">◈ Begin Focus Session</button>
+        </div>
+        <div>
+          <span class="comp-label" style="margin-bottom:7px;display:block;">Secondary</span>
+          <button class="btn btn-secondary">View Skills</button>
+        </div>
+        <div>
+          <span class="comp-label" style="margin-bottom:7px;display:block;">Ghost</span>
+          <button class="btn btn-ghost">Skip for now</button>
+        </div>
+        <div>
+          <span class="comp-label" style="margin-bottom:7px;display:block;">Danger — end session</span>
+          <button class="btn btn-danger">◼ End Session</button>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm">Continue</button>
+          <button class="btn btn-icon">◈</button>
+          <button class="btn btn-icon" style="border-radius:var(--r-sm);width:auto;padding:0 14px;font-size:14px;">‹</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="comp-wrap" style="gap:20px;">
+      <span class="comp-label">Form Elements</span>
+
+      <div class="input-group">
+        <span class="input-label">Your Name</span>
+        <input class="fq-input" type="text" placeholder="Aelindra…">
+      </div>
+
+      <div class="comp-wrap" style="gap:9px;">
+        <span class="comp-label">Toggles</span>
+        <div class="toggle-wrap">
+          <div class="toggle-track on" onclick="this.classList.toggle('on')">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="toggle-label">App Blocker — active</span>
+        </div>
+        <div class="toggle-wrap" style="margin-top:4px;">
+          <div class="toggle-track" onclick="this.classList.toggle('on')">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="toggle-label">Daily Nudge — off</span>
+        </div>
+      </div>
+
+      <div class="comp-wrap" style="gap:8px;">
+        <span class="comp-label">Slider — Hair Colour</span>
+        <input class="fq-slider" type="range" min="0" max="100" value="35"
+          style="background:linear-gradient(to right,#f5e6c8,#c9a05a 25%,#8b5e30 50%,#1a1a1a 78%,#2e2560)">
+        <div class="t-caption" style="margin-top:2px;">Silver thumb replaces gold — cooler, more precise feeling</div>
+      </div>
+    </div>
+
+    <!-- XP bars -->
+    <div class="comp-wrap" style="gap:16px;">
+      <span class="comp-label">XP & Progress Bars</span>
+
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-meta">
+          <span class="t-label">Fitness</span>
+          <span class="t-teal" style="font-size:10px;color:var(--xp-bright);text-shadow:0 0 10px var(--xp-glow);">Lv 6 · 78%</span>
+        </div>
+        <div class="xp-bar-track"><div class="xp-bar-fill w-78"></div></div>
+        <span class="t-caption">47.2 hrs logged</span>
+      </div>
+
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-meta">
+          <span class="t-label">Reading</span>
+          <span class="t-teal" style="font-size:10px;color:var(--xp-bright);text-shadow:0 0 10px var(--xp-glow);">Lv 5 · 62%</span>
+        </div>
+        <div class="xp-bar-track"><div class="xp-bar-fill w-62"></div></div>
+        <span class="t-caption">38.5 hrs logged</span>
+      </div>
+
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-meta">
+          <span class="t-label">Art</span>
+          <span class="t-teal" style="font-size:10px;color:var(--xp-bright);text-shadow:0 0 10px var(--xp-glow);">Lv 2 · 30%</span>
+        </div>
+        <div class="xp-bar-track"><div class="xp-bar-fill w-30"></div></div>
+        <span class="t-caption">6.1 hrs logged</span>
+      </div>
+
+      <div class="figma-note" style="margin-top:4px;">
+        <div class="figma-note-icon">◈</div>
+        <div class="figma-note-text">
+          <strong>WHY GOLD BARS WORK HERE</strong>
+          Against the cool blue-black, gold reads as alchemical warmth — like a vein of ore running through stone, or candlelight glimpsed through a window. The glow (box-shadow: 0 0 10px rgba(212,168,75,0.22)) is stronger than v2's teal bars, because gold against cool blue has higher inherent contrast. The shimmer feels like the bar is genuinely lit from within.
+        </div>
+      </div>
+    </div>
+
+    <!-- Chips + badges -->
+    <div class="comp-wrap" style="gap:16px;">
+      <span class="comp-label">Chips & Badges</span>
+
+      <div>
+        <span class="comp-label" style="margin-bottom:8px;display:block;">Skill Chips</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="skill-chip"><div class="skill-chip-icon">📚</div>Reading <span class="lvl">Lv5</span></div>
+          <div class="skill-chip"><div class="skill-chip-icon">🏃</div>Fitness <span class="lvl">Lv6</span></div>
+          <div class="skill-chip"><div class="skill-chip-icon">🎨</div>Art <span class="lvl">Lv2</span></div>
+        </div>
+      </div>
+
+      <div>
+        <span class="comp-label" style="margin-bottom:8px;display:block;">Badges</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span class="badge badge-teal">◈ AI GENERATION</span>
+          <span class="badge badge-teal">✦ COMPLETE</span>
+          <span class="badge badge-silver">LV 5</span>
+          <span class="badge badge-moon">SCHOLAR</span>
+          <span class="badge badge-muted">LOCKED</span>
+          <span class="badge badge-danger">◼ END</span>
+        </div>
+      </div>
+
+      <div>
+        <span class="comp-label" style="margin-bottom:8px;display:block;">Dividers</span>
+        <div class="fq-divider"><div class="fq-divider-line"></div><div class="fq-divider-text">Or</div><div class="fq-divider-line"></div></div>
+        <div class="fq-divider" style="margin-top:10px;"><div class="fq-divider-line"></div><div class="fq-divider-text">Appearance</div><div class="fq-divider-line"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §5  KEY SCREEN COMPONENTS
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">05</div>
+  <div class="section-heading">Key Screen Components</div>
+
+  <div class="grid-3">
+
+    <!-- Timer -->
+    <div class="comp-wrap">
+      <span class="comp-label">Focus Timer Ring</span>
+      <div class="card" style="padding:0;">
+        <div class="timer-ring-wrap">
+          <div class="timer-ring">
+            <svg viewBox="0 0 160 160">
+              <circle class="timer-outer" cx="80" cy="80" r="72"/>
+              <circle class="timer-track" cx="80" cy="80" r="70"/>
+              <circle class="timer-fill"  cx="80" cy="80" r="70"/>
+            </svg>
+            <div style="text-align:center;">
+              <div class="timer-number">1:24</div>
+              <div class="timer-sub">in progress</div>
+            </div>
+          </div>
+          <div class="t-eyebrow" style="margin-top:16px;">📚 Reading — Scholar Archive</div>
+          <div style="font-size:11px;margin-top:8px;font-style:italic;font-family:'EB Garamond',serif;color:var(--xp-bright);text-shadow:0 0 12px var(--xp-glow);">✦ +84 XP earned so far</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill list -->
+    <div class="comp-wrap">
+      <span class="comp-label">Skill List</span>
+      <div class="card">
+        <div class="t-label" style="margin-bottom:12px;">Active Skills</div>
+        <div class="skill-list-item">
+          <div class="skill-icon-box">🏃</div>
+          <div class="skill-item-meta">
+            <div class="skill-item-name-row">
+              <span class="t-h3" style="font-size:13px;">Fitness</span>
+              <span class="badge badge-muted">LV 6</span>
+            </div>
+            <div class="xp-bar-track"><div class="xp-bar-fill w-78"></div></div>
+          </div>
+        </div>
+        <div class="skill-list-item">
+          <div class="skill-icon-box">📚</div>
+          <div class="skill-item-meta">
+            <div class="skill-item-name-row">
+              <span class="t-h3" style="font-size:13px;">Reading</span>
+              <span class="badge badge-muted">LV 5</span>
+            </div>
+            <div class="xp-bar-track"><div class="xp-bar-fill w-62"></div></div>
+          </div>
+        </div>
+        <div class="skill-list-item">
+          <div class="skill-icon-box">🎨</div>
+          <div class="skill-item-meta">
+            <div class="skill-item-name-row">
+              <span class="t-h3" style="font-size:13px;">Art</span>
+              <span class="badge badge-muted">LV 2</span>
+            </div>
+            <div class="xp-bar-track"><div class="xp-bar-fill w-30"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log + nav -->
+    <div class="comp-wrap" style="gap:12px;">
+      <span class="comp-label">Session Log</span>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="log-item">
+          <div style="font-size:18px;">📚</div>
+          <div class="log-item-meta">
+            <div class="t-h3" style="font-size:12px;">Reading</div>
+            <div class="t-caption">Today · 1h 24min</div>
+          </div>
+          <div class="log-item-xp">+504 XP</div>
+        </div>
+        <div class="log-item" style="border-left-color:var(--xp-dim);">
+          <div style="font-size:18px;">🏃</div>
+          <div class="log-item-meta">
+            <div class="t-h3" style="font-size:12px;">Fitness</div>
+            <div class="t-caption">Yesterday · 45min</div>
+          </div>
+          <div class="log-item-xp">+270 XP</div>
+        </div>
+        <div class="log-item" style="border-left-color:var(--text-ghost);">
+          <div style="font-size:18px;">🎨</div>
+          <div class="log-item-meta">
+            <div class="t-h3" style="font-size:12px;">Art</div>
+            <div class="t-caption">Wed · 2h 0min</div>
+          </div>
+          <div class="log-item-xp">+720 XP</div>
+        </div>
+      </div>
+
+      <span class="comp-label" style="margin-top:8px;">Bottom Navigation</span>
+      <div class="nav-bar">
+        <div class="nav-item active"><div class="nav-item-icon">⌂</div><div class="nav-item-label">Home</div></div>
+        <div class="nav-item"><div class="nav-item-icon">⚔</div><div class="nav-item-label">Skills</div></div>
+        <div class="nav-item"><div class="nav-item-icon">📜</div><div class="nav-item-label">History</div></div>
+        <div class="nav-item"><div class="nav-item-icon">◈</div><div class="nav-item-label">Profile</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §6  SPACING + RADIUS
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">06</div>
+  <div class="section-heading">Spacing & Radius</div>
+
+  <div class="grid-2" style="gap:40px;">
+    <div>
+      <span class="comp-label" style="margin-bottom:16px;display:block;">Spacing Scale (px)</span>
+      <div class="space-demo">
+        <div class="space-chip"><div class="space-bar" style="height:4px"></div><span class="space-num">4</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:8px"></div><span class="space-num">8</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:12px"></div><span class="space-num">12</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:16px"></div><span class="space-num">16</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:20px"></div><span class="space-num">20</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:24px"></div><span class="space-num">24</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:32px"></div><span class="space-num">32</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:40px"></div><span class="space-num">40</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:48px"></div><span class="space-num">48</span></div>
+        <div class="space-chip"><div class="space-bar" style="height:56px"></div><span class="space-num">56</span></div>
+      </div>
+    </div>
+    <div>
+      <span class="comp-label" style="margin-bottom:16px;display:block;">Border Radius</span>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;">
+        <div class="comp-wrap" style="align-items:center;"><div style="width:48px;height:48px;background:rgba(94,196,192,0.08);border:1px solid var(--border-teal);border-radius:8px;"></div><span class="space-num">r-sm · 8</span></div>
+        <div class="comp-wrap" style="align-items:center;"><div style="width:56px;height:56px;background:rgba(94,196,192,0.08);border:1px solid var(--border-teal);border-radius:14px;"></div><span class="space-num">r-md · 14</span></div>
+        <div class="comp-wrap" style="align-items:center;"><div style="width:64px;height:64px;background:rgba(94,196,192,0.08);border:1px solid var(--border-teal);border-radius:20px;"></div><span class="space-num">r-lg · 20</span></div>
+        <div class="comp-wrap" style="align-items:center;"><div style="width:72px;height:72px;background:rgba(94,196,192,0.08);border:1px solid var(--border-teal);border-radius:28px;"></div><span class="space-num">r-xl · 28</span></div>
+        <div class="comp-wrap" style="align-items:center;"><div style="width:80px;height:32px;background:rgba(94,196,192,0.08);border:1px solid var(--border-teal);border-radius:999px;"></div><span class="space-num">pill</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §7  ICONS
+══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">07</div>
+  <div class="section-heading">Icon & Glyph System</div>
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon-box">⌂</div><div class="icon-name">Home</div></div>
+    <div class="icon-item"><div class="icon-box">⚔</div><div class="icon-name">Skills</div></div>
+    <div class="icon-item"><div class="icon-box">📜</div><div class="icon-name">History</div></div>
+    <div class="icon-item"><div class="icon-box">◈</div><div class="icon-name">Profile</div></div>
+    <div class="icon-item"><div class="icon-box" style="color:var(--teal);">✦</div><div class="icon-name">XP / Magic</div></div>
+    <div class="icon-item"><div class="icon-box">◼</div><div class="icon-name">End / Stop</div></div>
+    <div class="icon-item"><div class="icon-box">⏸</div><div class="icon-name">Pause</div></div>
+    <div class="icon-item"><div class="icon-box">›</div><div class="icon-name">Navigate</div></div>
+    <div class="icon-item"><div class="icon-box">‹</div><div class="icon-name">Back</div></div>
+    <div class="icon-item"><div class="icon-box">✕</div><div class="icon-name">Dismiss</div></div>
+    <div class="icon-item"><div class="icon-box">📚</div><div class="icon-name">Reading</div></div>
+    <div class="icon-item"><div class="icon-box">🏃</div><div class="icon-name">Fitness</div></div>
+    <div class="icon-item"><div class="icon-box">🎨</div><div class="icon-name">Art</div></div>
+    <div class="icon-item"><div class="icon-box">✍</div><div class="icon-name">Writing</div></div>
+    <div class="icon-item"><div class="icon-box">🌙</div><div class="icon-name">Night / Moon</div></div>
+    <div class="icon-item"><div class="icon-box" style="color:var(--teal);">❋</div><div class="icon-name">Bloom / New</div></div>
+    <div class="icon-item"><div class="icon-box">🔒</div><div class="icon-name">Locked</div></div>
+    <div class="icon-item"><div class="icon-box" style="color:var(--teal);font-size:16px;text-shadow:0 0 10px rgba(94,196,192,0.6);">◈</div><div class="icon-name">Sigil / Active</div></div>
+  </div>
+  <div class="figma-note" style="margin-top:20px;">
+    <div class="figma-note-icon">◈</div>
+    <div class="figma-note-text">
+      <strong>TEAL ICON USAGE</strong>
+      Active nav items, XP labels, and the primary sigil (◈) can be rendered in teal with a subtle text-shadow glow. All other icons remain in var(--text-muted) unless actively selected. This keeps the magical quality of teal reserved for things that matter — it should feel like something glowing, not a standard icon colour.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  §8  VOICE — unchanged
+══════════════════════════════════════ -->
+<div class="section" style="padding-bottom:0;">
+  <div class="section-title">08</div>
+  <div class="section-heading">Voice & Copy — Unchanged from v1</div>
+  <div class="grid-2" style="gap:20px;padding-bottom:60px;">
+    <div class="card">
+      <div class="t-eyebrow" style="color:var(--teal);margin-bottom:12px;">✓ Do</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="t-italic">"Your time. Your legend."</div>
+        <div class="t-italic">"The realm stirs as you work."</div>
+        <div class="t-italic">"Each session a step. Each hour a stone laid on the path only you will walk."</div>
+        <div class="t-italic">"Stay in the moment"</div>
+        <div class="t-moon" style="margin-top:4px;">"More paths unlock as you grow"</div>
+        <div class="t-caption" style="margin-top:4px;">New in v2: ambient copy can use the moonbeam colour (var(--moon)) to add an extra register — softer, more environmental, like the world speaking rather than the UI.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="t-eyebrow" style="color:var(--danger);margin-bottom:12px;">✕ Avoid</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="t-italic" style="text-decoration:line-through;color:var(--text-muted);">"You missed 3 days in a row!"</div>
+        <div class="t-italic" style="text-decoration:line-through;color:var(--text-muted);">"Complete your daily goal"</div>
+        <div class="t-italic" style="text-decoration:line-through;color:var(--text-muted);">"Streak broken 😢"</div>
+        <div class="t-italic" style="text-decoration:line-through;color:var(--text-muted);">"You're doing great! 🎉"</div>
+        <div class="t-caption" style="margin-top:6px;">No guilt, no exclamation marks, no emoji in functional UI copy. The voice is always the world speaking to you, not an app demanding your attention.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

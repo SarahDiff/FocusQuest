@@ -1,0 +1,523 @@
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useFQ } from "@/lib/fq-context";
+import { type Bearing, type Discipline, DISCIPLINE_META } from "@/lib/fq-data";
+
+type Step = 'splash' | 'philosophy' | 'identity' | 'discipline' | 'quest';
+
+const BEARINGS: { value: Bearing; label: string; glyph: string }[] = [
+  { value: 'female', label: 'She / Her', glyph: '♀' },
+  { value: 'neutral', label: 'They / Them', glyph: '◈' },
+  { value: 'male', label: 'He / Him', glyph: '♂' },
+];
+
+const DISCIPLINES: { value: Discipline; glyph: string }[] = [
+  { value: 'scholar', glyph: '✦' },
+  { value: 'warrior', glyph: '⚔' },
+  { value: 'scribe', glyph: '✒' },
+  { value: 'adventurer', glyph: '◎' },
+];
+
+export default function Onboarding() {
+  const { completeOnboarding } = useFQ();
+  const [, navigate] = useLocation();
+  const [step, setStep] = useState<Step>('splash');
+  const [name, setName] = useState('');
+  const [bearing, setBearing] = useState<Bearing>('neutral');
+  const [discipline, setDiscipline] = useState<Discipline | null>(null);
+
+  function next(to: Step) {
+    setStep(to);
+  }
+
+  function finish() {
+    if (!discipline) return;
+    completeOnboarding({ name: name.trim() || 'Traveller', discipline, bearing });
+    navigate('/');
+  }
+
+  const containerStyle: React.CSSProperties = {
+    minHeight: '100svh',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '32px 24px',
+    position: 'relative',
+    zIndex: 10,
+  };
+
+  // ── Splash ──────────────────────────────────────────
+  if (step === 'splash') {
+    return (
+      <div style={containerStyle}>
+        {/* Sigil ring */}
+        <div className="relative flex items-center justify-center mb-8 animate-float">
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: 140, height: 140,
+              border: '1px dashed rgba(94,196,192,0.25)',
+              animation: 'spin-slow 16s linear infinite',
+            }}
+          />
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: 110, height: 110,
+              border: '1px solid rgba(94,196,192,0.12)',
+            }}
+          />
+          <div
+            className="font-display text-5xl font-bold"
+            style={{ color: 'var(--fq-teal)', textShadow: '0 0 30px rgba(94,196,192,0.5)' }}
+          >
+            ◈
+          </div>
+        </div>
+
+        {/* Wordmark */}
+        <div className="text-center mb-4 animate-fade-in">
+          <h1
+            className="font-display font-bold tracking-[0.2em] uppercase mb-2"
+            style={{ fontSize: 28, color: 'var(--fq-text-primary)', letterSpacing: '0.22em' }}
+          >
+            FocusQuest
+          </h1>
+          <p
+            className="font-serif italic"
+            style={{ fontSize: 16, color: 'var(--fq-moon)' }}
+          >
+            Your time. Your legend.
+          </p>
+        </div>
+
+        <div className="h-px w-24 mb-10" style={{ background: 'var(--fq-border-mid)' }} />
+
+        <p
+          className="font-serif text-center mb-12 leading-relaxed max-w-[280px]"
+          style={{ fontSize: 15, color: 'var(--fq-text-body)', fontStyle: 'italic' }}
+        >
+          A quiet realm where real effort becomes legend.
+        </p>
+
+        <button
+          onClick={() => next('philosophy')}
+          className="font-display tracking-[0.16em] uppercase cursor-pointer transition-all duration-200"
+          data-testid="button-begin"
+          style={{
+            background: 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)',
+            border: '1.5px solid var(--fq-border-teal)',
+            color: 'var(--fq-teal-bright)',
+            borderRadius: 999,
+            padding: '15px 48px',
+            fontSize: 12,
+            letterSpacing: '0.16em',
+            boxShadow: '0 0 24px rgba(94,196,192,0.22), 0 4px 20px rgba(0,0,0,0.5)',
+          }}
+        >
+          Begin
+        </button>
+      </div>
+    );
+  }
+
+  // ── Philosophy ─────────────────────────────────────
+  if (step === 'philosophy') {
+    return (
+      <div style={containerStyle}>
+        <div className="max-w-[320px] text-center animate-fade-in">
+          {/* Geometric illustration */}
+          <div className="flex items-center justify-center mb-10">
+            <div className="relative" style={{ width: 120, height: 120 }}>
+              <div className="absolute inset-0 rounded-full" style={{ border: '1px solid rgba(168,196,232,0.15)' }} />
+              <div className="absolute rounded-full" style={{ inset: 16, border: '1px solid rgba(168,196,232,0.08)' }} />
+              <div className="absolute rounded-full" style={{ inset: 32, border: '1px dashed rgba(94,196,192,0.2)' }} />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-display text-2xl" style={{ color: 'var(--fq-moon)' }}>◎</span>
+              </div>
+              {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
+                <div
+                  key={angle}
+                  className="absolute"
+                  style={{
+                    width: 3, height: 3, borderRadius: '50%',
+                    background: 'rgba(94,196,192,0.3)',
+                    top: '50%', left: '50%',
+                    transform: `rotate(${angle}deg) translateX(52px) translate(-50%, -50%)`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <p
+            className="font-display mb-2"
+            style={{ fontSize: 11, letterSpacing: '0.22em', color: 'var(--fq-teal)', opacity: 0.75, textTransform: 'uppercase' }}
+          >
+            A different path
+          </p>
+
+          <h2
+            className="font-display font-semibold mb-6"
+            style={{ fontSize: 20, color: 'var(--fq-text-primary)', lineHeight: 1.3 }}
+          >
+            Time flows where attention goes.
+          </h2>
+
+          <p
+            className="font-serif italic mb-4 leading-relaxed"
+            style={{ fontSize: 16, color: 'var(--fq-text-body)' }}
+          >
+            Most apps pull you in. FocusQuest asks you to step away.
+          </p>
+
+          <p
+            className="font-serif mb-10 leading-relaxed"
+            style={{ fontSize: 15, color: 'var(--fq-text-muted)' }}
+          >
+            Start a session. Put your phone down. Return when your work is done.
+            Your character grows while you're away.
+          </p>
+
+          <button
+            onClick={() => next('identity')}
+            className="font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-2 mx-auto"
+            data-testid="button-philosophy-next"
+            style={{
+              background: 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)',
+              border: '1.5px solid var(--fq-border-teal)',
+              color: 'var(--fq-teal-bright)',
+              borderRadius: 999,
+              padding: '13px 36px',
+              fontSize: 11,
+              boxShadow: '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            Continue <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Identity ───────────────────────────────────────
+  if (step === 'identity') {
+    return (
+      <div style={containerStyle}>
+        <div className="w-full max-w-[360px] animate-fade-in">
+          <button
+            onClick={() => next('philosophy')}
+            className="flex items-center gap-1 mb-8 cursor-pointer"
+            style={{ background: 'none', border: 'none', color: 'var(--fq-text-muted)', fontSize: 12 }}
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
+
+          <p
+            className="font-display mb-2"
+            style={{ fontSize: 10, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.8, textTransform: 'uppercase' }}
+          >
+            Your Identity
+          </p>
+          <h2
+            className="font-display font-semibold mb-8"
+            style={{ fontSize: 22, color: 'var(--fq-text-primary)' }}
+          >
+            What shall you be called?
+          </h2>
+
+          {/* Name input */}
+          <div className="mb-8">
+            <label
+              className="font-display block mb-2"
+              style={{ fontSize: 9, letterSpacing: '0.2em', color: 'var(--fq-text-muted)', textTransform: 'uppercase' }}
+            >
+              Your name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Aelindra, Kael, The Wanderer..."
+              maxLength={24}
+              className="w-full font-serif transition-all duration-200"
+              data-testid="input-character-name"
+              style={{
+                background: 'var(--fq-inset)',
+                border: '1px solid var(--fq-border)',
+                borderRadius: 14,
+                padding: '14px 18px',
+                fontSize: 17,
+                color: 'var(--fq-text-primary)',
+                outline: 'none',
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = 'var(--fq-border-teal)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(94,196,192,0.12)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = 'var(--fq-border)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+
+          {/* Bearing selection */}
+          <div className="mb-10">
+            <label
+              className="font-display block mb-3"
+              style={{ fontSize: 9, letterSpacing: '0.2em', color: 'var(--fq-text-muted)', textTransform: 'uppercase' }}
+            >
+              Bearing
+            </label>
+            <div className="flex gap-3">
+              {BEARINGS.map(b => (
+                <button
+                  key={b.value}
+                  onClick={() => setBearing(b.value)}
+                  className="flex-1 flex flex-col items-center gap-2 py-4 cursor-pointer transition-all duration-200 rounded-2xl"
+                  data-testid={`button-bearing-${b.value}`}
+                  style={{
+                    background: bearing === b.value ? 'rgba(94,196,192,0.1)' : 'var(--fq-surface)',
+                    border: `1.5px solid ${bearing === b.value ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
+                    outline: 'none',
+                    boxShadow: bearing === b.value ? '0 0 14px rgba(94,196,192,0.18)' : 'none',
+                  }}
+                >
+                  <span
+                    className="font-display"
+                    style={{ fontSize: 18, color: bearing === b.value ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}
+                  >
+                    {b.glyph}
+                  </span>
+                  <span
+                    className="font-display"
+                    style={{ fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: bearing === b.value ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}
+                  >
+                    {b.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => next('discipline')}
+            className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
+            data-testid="button-identity-next"
+            style={{
+              background: 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)',
+              border: '1.5px solid var(--fq-border-teal)',
+              color: 'var(--fq-teal-bright)',
+              borderRadius: 999,
+              padding: '15px 36px',
+              fontSize: 11,
+              boxShadow: '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            Choose Your Path <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Discipline ─────────────────────────────────────
+  if (step === 'discipline') {
+    return (
+      <div style={{ ...containerStyle, justifyContent: 'flex-start', paddingTop: 56 }}>
+        <div className="w-full max-w-[380px] animate-fade-in">
+          <button
+            onClick={() => next('identity')}
+            className="flex items-center gap-1 mb-8 cursor-pointer"
+            style={{ background: 'none', border: 'none', color: 'var(--fq-text-muted)', fontSize: 12 }}
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
+
+          <p
+            className="font-display mb-2"
+            style={{ fontSize: 10, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.8, textTransform: 'uppercase' }}
+          >
+            Your Path
+          </p>
+          <h2
+            className="font-display font-semibold mb-2"
+            style={{ fontSize: 22, color: 'var(--fq-text-primary)' }}
+          >
+            Choose Your Discipline
+          </h2>
+          <p
+            className="font-serif italic mb-8"
+            style={{ fontSize: 15, color: 'var(--fq-text-muted)' }}
+          >
+            More paths unlock as you grow.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            {DISCIPLINES.map(({ value, glyph }) => {
+              const meta = DISCIPLINE_META[value];
+              const selected = discipline === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => setDiscipline(value)}
+                  className="cursor-pointer transition-all duration-200 rounded-2xl text-left"
+                  data-testid={`button-discipline-${value}`}
+                  style={{
+                    background: selected ? 'rgba(94,196,192,0.1)' : 'var(--fq-frost-subtle)',
+                    border: `1.5px solid ${selected ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
+                    backdropFilter: 'blur(14px)',
+                    borderRadius: 20,
+                    padding: '20px 16px',
+                    outline: 'none',
+                    boxShadow: selected ? '0 0 20px rgba(94,196,192,0.18), var(--fq-shadow-card)' : 'var(--fq-shadow-card)',
+                  }}
+                >
+                  <div
+                    className="font-display text-2xl mb-3"
+                    style={{ color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', textShadow: selected ? '0 0 16px rgba(94,196,192,0.5)' : 'none' }}
+                  >
+                    {glyph}
+                  </div>
+                  <div
+                    className="font-display font-semibold mb-1"
+                    style={{ fontSize: 13, color: selected ? 'var(--fq-text-primary)' : 'var(--fq-text-body)', letterSpacing: '0.04em' }}
+                  >
+                    {meta.label}
+                  </div>
+                  <div
+                    className="font-display uppercase"
+                    style={{ fontSize: 8, letterSpacing: '0.14em', color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', marginBottom: 8, opacity: 0.85 }}
+                  >
+                    {meta.tagline}
+                  </div>
+                  <p
+                    className="font-serif"
+                    style={{ fontSize: 12, color: 'var(--fq-text-muted)', lineHeight: 1.5 }}
+                  >
+                    {meta.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => discipline && next('quest')}
+            className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
+            data-testid="button-discipline-next"
+            disabled={!discipline}
+            style={{
+              background: discipline
+                ? 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)'
+                : 'rgba(255,255,255,0.03)',
+              border: `1.5px solid ${discipline ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
+              color: discipline ? 'var(--fq-teal-bright)' : 'var(--fq-text-ghost)',
+              borderRadius: 999,
+              padding: '15px 36px',
+              fontSize: 11,
+              boxShadow: discipline ? '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)' : 'none',
+              opacity: discipline ? 1 : 0.5,
+              cursor: discipline ? 'pointer' : 'not-allowed',
+            }}
+          >
+            Forge Your Legend <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Quest Begins ───────────────────────────────────
+  if (step === 'quest') {
+    const meta = discipline ? DISCIPLINE_META[discipline] : null;
+    const displayName = name.trim() || 'Traveller';
+
+    return (
+      <div style={containerStyle}>
+        <div className="w-full max-w-[360px] text-center animate-scale-in">
+          {/* Sigil */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="relative" style={{ width: 100, height: 100 }}>
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{ border: '1px dashed rgba(212,168,75,0.3)', animation: 'spin-slow 10s linear infinite' }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-display font-bold text-4xl" style={{ color: 'var(--fq-xp)', textShadow: '0 0 24px rgba(212,168,75,0.5)' }}>
+                  ✦
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Character summary card */}
+          <div
+            className="rounded-2xl mb-8 p-6 relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(145deg, rgba(14,20,32,0.95) 0%, rgba(8,13,22,0.98) 100%)',
+              border: '1px solid var(--fq-border-mid)',
+              boxShadow: 'var(--fq-shadow-card)',
+            }}
+          >
+            {/* Teal top line */}
+            <div
+              className="absolute top-0 left-0 right-0"
+              style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(94,196,192,0.4) 50%, transparent)' }}
+            />
+
+            <div
+              className="font-display mb-1"
+              style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-teal)', textTransform: 'uppercase', opacity: 0.85 }}
+            >
+              The Traveller
+            </div>
+            <h3
+              className="font-display font-bold mb-1"
+              style={{ fontSize: 24, color: 'var(--fq-text-primary)', letterSpacing: '0.04em' }}
+            >
+              {displayName}
+            </h3>
+            {meta && (
+              <p
+                className="font-display uppercase"
+                style={{ fontSize: 9, letterSpacing: '0.14em', color: 'var(--fq-xp)' }}
+              >
+                {meta.label}
+              </p>
+            )}
+          </div>
+
+          <p
+            className="font-serif italic mb-10"
+            style={{ fontSize: 16, color: 'var(--fq-moon)', lineHeight: 1.6 }}
+          >
+            Your legend begins now.
+          </p>
+
+          <button
+            onClick={finish}
+            className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200"
+            data-testid="button-enter-quest"
+            style={{
+              background: 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)',
+              border: '1.5px solid var(--fq-border-teal)',
+              color: 'var(--fq-teal-bright)',
+              borderRadius: 999,
+              padding: '16px 36px',
+              fontSize: 12,
+              boxShadow: '0 0 28px rgba(94,196,192,0.25), 0 4px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            Enter the Quest
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
