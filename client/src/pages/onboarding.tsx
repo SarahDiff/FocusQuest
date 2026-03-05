@@ -357,8 +357,6 @@ export default function Onboarding() {
 
   // ── Avatar ──────────────────────────────────────────
   if (step === 'avatar') {
-    const displayName = name.trim() || 'Traveller';
-    const bearingLabel = AVATAR_BEARINGS.find(b => b.value === bearing)?.label || 'Neutral';
 
     return (
       <div
@@ -413,27 +411,6 @@ export default function Onboarding() {
           >
             <ChevronLeft size={14} /> Back
           </button>
-          {/* Name + bearing badge */}
-          <div
-            className="absolute bottom-5 left-0 right-0 flex justify-center"
-          >
-            <div
-              className="font-display uppercase"
-              style={{
-                fontSize: 9,
-                letterSpacing: '0.22em',
-                color: 'var(--fq-xp-bright)',
-                background: 'rgba(15,19,24,0.7)',
-                border: '1px solid rgba(212,168,75,0.35)',
-                borderRadius: 999,
-                padding: '5px 18px',
-                backdropFilter: 'blur(8px)',
-                boxShadow: '0 0 12px rgba(212,168,75,0.15)',
-              }}
-            >
-              The {displayName} · {bearingLabel}
-            </div>
-          </div>
         </div>
 
         {/* Content */}
