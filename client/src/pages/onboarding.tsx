@@ -420,7 +420,7 @@ export default function Onboarding() {
         {/* Content */}
         <div
           className="flex-1 mx-auto w-full"
-          style={{ maxWidth: 280, paddingLeft: 20, paddingRight: 20, paddingBottom: 40 }}
+          style={{ maxWidth: 340, paddingLeft: 24, paddingRight: 24, paddingBottom: 40 }}
         >
           {/* Heading */}
           <div className="text-center mb-2 mt-5">
