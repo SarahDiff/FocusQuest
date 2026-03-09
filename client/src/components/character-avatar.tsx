@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { type Bearing } from "@/lib/fq-data";
 
 interface CharacterAvatarProps {
@@ -5,6 +6,8 @@ interface CharacterAvatarProps {
   bearing?: Bearing;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  glowing?: boolean;
+  onGlowComplete?: () => void;
 }
 
 const SIZE_MAP = {
@@ -14,16 +17,24 @@ const SIZE_MAP = {
   xl:  { outer: 100, inner: 86, font: 34 },
 };
 
-export default function CharacterAvatar({ name, bearing = 'neutral', size = 'md', className = '' }: CharacterAvatarProps) {
+const GLOW_DURATION_MS = 2500;
+
+export default function CharacterAvatar({ name, bearing = 'neutral', size = 'md', className = '', glowing = false, onGlowComplete }: CharacterAvatarProps) {
   const dim = SIZE_MAP[size];
   const initials = name.slice(0, 2).toUpperCase();
 
   const bearingGlyph = bearing === 'female' ? '♀' : bearing === 'male' ? '♂' : '◈';
 
+  useEffect(() => {
+    if (!glowing || !onGlowComplete) return;
+    const t = setTimeout(onGlowComplete, GLOW_DURATION_MS);
+    return () => clearTimeout(t);
+  }, [glowing, onGlowComplete]);
+
   return (
     <div
-      className={`relative flex-shrink-0 ${className}`}
-      style={{ width: dim.outer, height: dim.outer }}
+      className={`relative flex-shrink-0 ${glowing ? 'fq-avatar-glow' : ''} ${className}`}
+      style={{ width: dim.outer, height: dim.outer, borderRadius: '50%' }}
     >
       {/* Outer glow ring */}
       <div

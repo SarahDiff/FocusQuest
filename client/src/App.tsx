@@ -13,10 +13,11 @@ import Session from "@/pages/session";
 import Skills from "@/pages/skills";
 import History from "@/pages/history";
 import Profile from "@/pages/profile";
+import EditCharacter from "@/pages/edit-character";
 import NotFound from "@/pages/not-found";
 
 const SESSION_ROUTES = ["/session", "/session/complete"];
-const NAV_ROUTES = ["/", "/home", "/skills", "/history", "/profile"];
+const NAV_ROUTES = ["/", "/home", "/skills", "/history", "/profile", "/profile/edit-character"];
 
 function AppInner() {
   const { state } = useFQ();
@@ -47,6 +48,7 @@ function AppInner() {
             <Route path="/skills" component={Skills} />
             <Route path="/history" component={History} />
             <Route path="/profile" component={Profile} />
+            <Route path="/profile/edit-character" component={EditCharacter} />
             <Route component={NotFound} />
           </Switch>
         </main>

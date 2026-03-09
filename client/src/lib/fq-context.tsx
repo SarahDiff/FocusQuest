@@ -9,11 +9,13 @@ import {
   loadState,
   saveState,
   calculateXP,
+  getSkillLevel,
 } from "./fq-data";
 
 interface FQContextValue {
   state: AppState;
   completeOnboarding: (character: Character) => void;
+  updateCharacter: (character: Character) => void;
   startSession: (disciplineId: string, targetMinutes: number | null) => void;
   pauseSession: () => void;
   resumeSession: () => void;
@@ -23,6 +25,9 @@ interface FQContextValue {
   activateDiscipline: (id: string) => void;
   setShieldEnabled: (value: boolean) => void;
   setBlocklist: (items: string[]) => void;
+  setNudgeEnabled: (value: boolean) => void;
+  setMinSessionMinutes: (value: number) => void;
+  clearPendingAvatarUpgrade: () => void;
 }
 
 const FQContext = createContext<FQContextValue | null>(null);
@@ -49,6 +54,13 @@ export function FQProvider({ children }: { children: ReactNode }) {
       character,
       onboardingComplete: true,
       userDisciplines,
+    }));
+  }, [setState]);
+
+  const updateCharacter = useCallback((character: Character) => {
+    setState(prev => ({
+      ...prev,
+      character,
     }));
   }, [setState]);
 
@@ -125,11 +137,17 @@ export function FQProvider({ children }: { children: ReactNode }) {
           : d
       );
 
+      const ud = prev.userDisciplines.find(d => d.disciplineId === as.skillId);
+      const levelBefore = ud ? getSkillLevel(ud.totalMinutes) : 0;
+      const levelAfter = ud ? getSkillLevel(ud.totalMinutes + durationMinutes) : 0;
+      const levelledUp = levelAfter > levelBefore;
+
       return {
         ...prev,
         activeSession: null,
         sessions: [session, ...prev.sessions],
         userDisciplines: updatedDisciplines,
+        pendingAvatarUpgrade: levelledUp,
       };
     });
 
@@ -171,6 +189,20 @@ export function FQProvider({ children }: { children: ReactNode }) {
     }));
   }, [setState]);
 
+  const setNudgeEnabled = useCallback((value: boolean) => {
+    setState(prev => ({
+      ...prev,
+      nudgeEnabled: value,
+    }));
+  }, [setState]);
+
+  const setMinSessionMinutes = useCallback((value: number) => {
+    setState(prev => ({
+      ...prev,
+      minSessionMinutes: Math.max(1, Math.round(value)),
+    }));
+  }, [setState]);
+
   const resetApp = useCallback(() => {
     setState(() => ({
       character: null,
@@ -178,13 +210,23 @@ export function FQProvider({ children }: { children: ReactNode }) {
       userDisciplines: [],
       sessions: [],
       activeSession: null,
+      shieldEnabled: false,
+      blocklist: [],
+      nudgeEnabled: false,
+      minSessionMinutes: 15,
+      pendingAvatarUpgrade: false,
     }));
+  }, [setState]);
+
+  const clearPendingAvatarUpgrade = useCallback(() => {
+    setState(prev => (prev.pendingAvatarUpgrade ? { ...prev, pendingAvatarUpgrade: false } : prev));
   }, [setState]);
 
   return (
     <FQContext.Provider value={{
       state,
       completeOnboarding,
+      updateCharacter,
       startSession,
       pauseSession,
       resumeSession,
@@ -194,6 +236,9 @@ export function FQProvider({ children }: { children: ReactNode }) {
       activateDiscipline,
       setShieldEnabled,
       setBlocklist,
+      setNudgeEnabled,
+      setMinSessionMinutes,
+      clearPendingAvatarUpgrade,
     }}>
       {children}
     </FQContext.Provider>

@@ -47,6 +47,9 @@ export interface AppState {
   activeSession: ActiveSessionData | null;
   shieldEnabled: boolean;
   blocklist: string[];
+  nudgeEnabled: boolean;
+  minSessionMinutes: number;
+  pendingAvatarUpgrade: boolean;
 }
 
 // ── Discipline Metadata ────────────────────────────
@@ -117,6 +120,9 @@ const DEFAULT_STATE: AppState = {
   activeSession: null,
   shieldEnabled: false,
   blocklist: [],
+  nudgeEnabled: false,
+  minSessionMinutes: 15,
+  pendingAvatarUpgrade: false,
 };
 
 export function loadState(): AppState {
@@ -140,6 +146,15 @@ export function loadState(): AppState {
     }
     if (!Array.isArray(parsed.blocklist)) {
       parsed.blocklist = [];
+    }
+    if (typeof parsed.nudgeEnabled !== 'boolean') {
+      parsed.nudgeEnabled = false;
+    }
+    if (typeof parsed.minSessionMinutes !== 'number' || parsed.minSessionMinutes < 1) {
+      parsed.minSessionMinutes = 15;
+    }
+    if (typeof parsed.pendingAvatarUpgrade !== 'boolean') {
+      parsed.pendingAvatarUpgrade = false;
     }
     return { ...DEFAULT_STATE, ...parsed };
   } catch {

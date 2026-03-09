@@ -82,12 +82,15 @@ function ToggleRow({ label, sub, value, onToggle }: {
   );
 }
 
+const MIN_SESSION_OPTIONS = [15, 25, 45, 60];
+
 export default function Profile() {
-  const { state, resetApp, setShieldEnabled } = useFQ();
+  const { state, resetApp, setShieldEnabled, setNudgeEnabled, setMinSessionMinutes } = useFQ();
   const [, navigate] = useLocation();
-  const [nudge, setNudge] = useState(false);
-  const [shield, setShield] = useState(state.shieldEnabled);
   const [showReset, setShowReset] = useState(false);
+  const shield = state.shieldEnabled;
+  const nudge = state.nudgeEnabled;
+  const minSessionMinutes = state.minSessionMinutes;
 
   const char = state.character;
   const totalMinutes = state.userDisciplines.reduce((sum, d) => sum + d.totalMinutes, 0);
@@ -237,22 +240,40 @@ export default function Profile() {
           label="The Shield"
           sub="Holds distracting apps at bay during sessions"
           value={shield}
-          onToggle={() => {
-            setShield(prev => {
-              const next = !prev;
-              setShieldEnabled(next);
-              return next;
-            });
-          }}
+          onToggle={() => setShieldEnabled(!shield)}
         />
         <ToggleRow
           label="Daily Nudge"
           sub="Gentle, not a guilt trip"
           value={nudge}
-          onToggle={() => setNudge(v => !v)}
+          onToggle={() => setNudgeEnabled(!nudge)}
         />
-        <div style={{ paddingBottom: 4 }}>
-          <SettingRow label="Minimum Session Duration" sub="15 minutes" />
+        <div className="py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+          <p className="font-display mb-2" style={{ fontSize: 13, color: 'var(--fq-text-primary)', letterSpacing: '0.04em' }}>
+            Minimum Session Duration
+          </p>
+          <p className="font-serif italic mb-3" style={{ fontSize: 12, color: 'var(--fq-text-muted)', marginTop: 2 }}>
+            Shortest session that counts toward progress
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            {MIN_SESSION_OPTIONS.map(m => (
+              <button
+                key={m}
+                onClick={() => setMinSessionMinutes(m)}
+                className="font-display cursor-pointer transition-all duration-200 rounded-full py-2 px-4"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.1em',
+                  background: minSessionMinutes === m ? 'rgba(94,196,192,0.15)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${minSessionMinutes === m ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
+                  color: minSessionMinutes === m ? 'var(--fq-teal-bright)' : 'var(--fq-text-muted)',
+                  outline: 'none',
+                }}
+              >
+                {m} min
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -272,7 +293,11 @@ export default function Profile() {
         >
           Character
         </p>
-        <SettingRow label="Edit Character" sub="Name, avatar, bearing" />
+        <SettingRow
+          label="Edit Character"
+          sub="Name, avatar, bearing"
+          onPress={() => navigate('/profile/edit-character')}
+        />
         <div style={{ paddingBottom: 4 }}>
           <SettingRow label="Manage Skills" sub="Add or remove active skills" />
         </div>

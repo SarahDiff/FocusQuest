@@ -280,7 +280,7 @@ function WeekRow() {
 }
 
 export default function Home() {
-  const { state } = useFQ();
+  const { state, clearPendingAvatarUpgrade } = useFQ();
   const [showSheet, setShowSheet] = useState(false);
 
   const char = state.character;
@@ -314,7 +314,13 @@ export default function Home() {
         <div className="absolute pointer-events-none" style={{ top: -40, right: -40, width: 120, height: 120, background: 'radial-gradient(circle, rgba(94,196,192,0.06) 0%, transparent 70%)' }} />
 
         <div className="flex items-center gap-4 p-5">
-          <CharacterAvatar name={char?.name || 'T'} bearing={char?.bearing} size="lg" />
+          <CharacterAvatar
+            name={char?.name || 'T'}
+            bearing={char?.bearing}
+            size="lg"
+            glowing={state.pendingAvatarUpgrade}
+            onGlowComplete={clearPendingAvatarUpgrade}
+          />
 
           <div className="flex-1 min-w-0">
             <span className="font-display font-bold truncate block mb-1" style={{ fontSize: 18, color: 'var(--fq-text-primary)', letterSpacing: '0.02em' }}>
