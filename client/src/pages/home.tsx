@@ -3,19 +3,27 @@ import { useLocation } from "wouter";
 import { ChevronRight, X } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
 import {
-  getSkillLevel, getSkillXPProgress, getTimeOfDayGreeting,
-  formatDuration, DISCIPLINE_META,
+  getSkillLevel,
+  getSkillXPProgress,
+  getTimeOfDayGreeting,
+  formatDuration,
+  DISCIPLINE_META,
+  ALL_DISCIPLINES,
 } from "@/lib/fq-data";
 import XPBar from "@/components/xp-bar";
 import CharacterAvatar from "@/components/character-avatar";
 
 function SessionSheet({ onClose }: { onClose: () => void }) {
-  const { state, startSession } = useFQ();
+  const { state, startSession, activateDiscipline } = useFQ();
   const [, navigate] = useLocation();
   const [selected, setSelected] = useState<string | null>(null);
   const [targetMin, setTargetMin] = useState<number | null>(null);
 
   const { userDisciplines } = state;
+  const activeDisciplines = [...userDisciplines].sort((a, b) => b.totalMinutes - a.totalMinutes);
+  const inactiveDisciplines = ALL_DISCIPLINES.filter(
+    id => !userDisciplines.some(d => d.disciplineId === id),
+  );
 
   function handleBegin() {
     if (!selected) return;
@@ -73,7 +81,7 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {userDisciplines.map(ud => {
+              {activeDisciplines.map(ud => {
                 const meta = DISCIPLINE_META[ud.disciplineId];
                 const sel = selected === ud.disciplineId;
                 const level = getSkillLevel(ud.totalMinutes);
@@ -116,6 +124,63 @@ function SessionSheet({ onClose }: { onClose: () => void }) {
                   </button>
                 );
               })}
+              {inactiveDisciplines.length > 0 && (
+                <>
+                  <div className="flex items-center gap-3 mt-4 mb-1">
+                    <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
+                    <span
+                      className="font-display uppercase"
+                      style={{ fontSize: 8, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}
+                    >
+                      More Paths
+                    </span>
+                    <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
+                  </div>
+                  {inactiveDisciplines.map(id => {
+                    const meta = DISCIPLINE_META[id];
+                    const sel = selected === id;
+                    return (
+                      <button
+                        key={id}
+                        onClick={() => {
+                          activateDiscipline(id);
+                          setSelected(id);
+                        }}
+                        className="flex items-center gap-4 w-full text-left cursor-pointer transition-all duration-200 rounded-2xl"
+                        style={{
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--fq-border)',
+                          padding: '12px 14px',
+                          outline: 'none',
+                          opacity: sel ? 0.7 : 0.5,
+                        }}
+                      >
+                        <div
+                          className="flex items-center justify-center rounded-lg flex-shrink-0"
+                          style={{ width: 40, height: 40, background: 'rgba(15,19,24,0.8)', border: '1px solid var(--fq-border)' }}
+                        >
+                          <span className="font-display text-lg" style={{ color: 'var(--fq-text-muted)' }}>
+                            {meta.glyph}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-display truncate" style={{ fontSize: 13, color: 'var(--fq-text-body)', letterSpacing: '0.04em' }}>
+                              {meta.label}
+                            </span>
+                            <span className="font-display uppercase" style={{ fontSize: 8, color: 'var(--fq-text-muted)', letterSpacing: '0.08em' }}>
+                              Inactive
+                            </span>
+                          </div>
+                          <p className="font-display uppercase truncate" style={{ fontSize: 8, letterSpacing: '0.12em', color: 'var(--fq-text-muted)', opacity: 0.8 }}>
+                            {meta.tagline}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -223,6 +288,9 @@ export default function Home() {
   const overallLevel = getSkillLevel(totalMinutes);
   const overallProgress = getSkillXPProgress(totalMinutes);
   const greeting = getTimeOfDayGreeting();
+  const topDisciplines = [...state.userDisciplines]
+    .sort((a, b) => b.totalMinutes - a.totalMinutes)
+    .slice(0, 3);
 
   const primaryDisciplineMeta = char?.disciplines?.[0] ? DISCIPLINE_META[char.disciplines[0]] : null;
 
@@ -294,6 +362,87 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Top 3 Disciplines */}
+      {topDisciplines.length > 0 && (
+        <div
+          className="rounded-2xl p-5 mb-6 animate-fade-in"
+          style={{
+            background: 'var(--fq-frost-subtle)',
+            backdropFilter: 'blur(14px)',
+            border: '1px solid var(--fq-border)',
+            boxShadow: 'var(--fq-shadow-card)',
+          }}
+        >
+          <p
+            className="font-display uppercase mb-3"
+            style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-text-muted)' }}
+          >
+            Your Disciplines
+          </p>
+          <div className="flex flex-col gap-2">
+            {topDisciplines.map(ud => {
+              const meta = DISCIPLINE_META[ud.disciplineId];
+              const level = getSkillLevel(ud.totalMinutes);
+              const prog = getSkillXPProgress(ud.totalMinutes);
+              return (
+                <div
+                  key={ud.disciplineId}
+                  className="flex items-center gap-3 rounded-2xl"
+                  style={{
+                    background: 'rgba(16,22,32,0.74)',
+                    border: '1px solid var(--fq-border)',
+                    padding: '10px 12px',
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-center rounded-xl flex-shrink-0"
+                    style={{
+                      width: 34,
+                      height: 34,
+                      background: 'rgba(94,196,192,0.06)',
+                      border: '1px solid var(--fq-border)',
+                    }}
+                  >
+                    <span
+                      className="font-display"
+                      style={{ fontSize: 18, color: 'var(--fq-teal)' }}
+                    >
+                      {meta.glyph}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className="font-display truncate"
+                        style={{
+                          fontSize: 12,
+                          letterSpacing: '0.06em',
+                          color: 'var(--fq-text-primary)',
+                        }}
+                      >
+                        {meta.label}
+                      </span>
+                      <span
+                        className="font-display uppercase"
+                        style={{
+                          fontSize: 8,
+                          letterSpacing: '0.16em',
+                          color: 'var(--fq-teal)',
+                          opacity: 0.85,
+                        }}
+                      >
+                        Lvl {level}
+                      </span>
+                    </div>
+                    <XPBar pct={prog.pct} height={3} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Weekly Activity */}
       <div

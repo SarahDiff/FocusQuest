@@ -5,7 +5,7 @@ import { useFQ } from "@/lib/fq-context";
 import { type Bearing, type Discipline, DISCIPLINE_META, ALL_DISCIPLINES } from "@/lib/fq-data";
 import characterImg from "@assets/ChatGPT_Image_Mar_5,_2026_at_08_15_07_PM_1772738146448.png";
 
-type Step = 'splash' | 'philosophy' | 'identity' | 'avatar' | 'discipline' | 'quest';
+type Step = 'splash' | 'philosophy' | 'identity' | 'avatar' | 'discipline' | 'shield' | 'quest';
 
 const BEARINGS: { value: Bearing; label: string; glyph: string }[] = [
   { value: 'female', label: 'She / Her', glyph: '♀' },
@@ -23,6 +23,14 @@ const HAIR_OPTIONS = ['Raven Black', 'Tawny Brown', 'Amber Gold', 'Auburn Red', 
 const HAIR_LENGTH_OPTIONS = ['Cropped', 'Short', 'Shoulder', 'Long Straight', 'Long Wavy', 'Curly Short', 'Curly Long'];
 const SKIN_OPTIONS = ['Alabaster', 'Pale Rose', 'Sun-Kissed', 'Bronze', 'Copper', 'Ebony'];
 const EYE_COLOR_OPTIONS = ['Storm Grey', 'Forest Green', 'Ocean Blue', 'Amber', 'Onyx', 'Violet'];
+
+const SHIELD_CATEGORIES: { id: string; label: string; description: string }[] = [
+  { id: 'social', label: 'Social', description: 'Instagram, TikTok, X' },
+  { id: 'video', label: 'Video', description: 'YouTube, Netflix' },
+  { id: 'games', label: 'Games', description: 'Games and play' },
+  { id: 'shopping', label: 'Shopping', description: 'Shops and marketplaces' },
+  { id: 'news', label: 'News', description: 'Headlines and feeds' },
+];
 
 
 function SectionDivider({ label }: { label: string }) {
@@ -81,7 +89,7 @@ function SliderRow({
 }
 
 export default function Onboarding() {
-  const { completeOnboarding } = useFQ();
+  const { completeOnboarding, setShieldEnabled, setBlocklist, state } = useFQ();
   const [, navigate] = useLocation();
   const [step, setStep] = useState<Step>('splash');
   const [name, setName] = useState('');
@@ -99,6 +107,7 @@ export default function Onboarding() {
   const [hairLengthIndex, setHairLengthIndex] = useState(3);
   const [skinIndex, setSkinIndex] = useState(2);
   const [eyeColorIndex, setEyeColorIndex] = useState(2);
+  const [shieldSelection, setShieldSelection] = useState<string[]>(state.blocklist || []);
 
   function next(to: Step) {
     setStep(to);
@@ -662,7 +671,7 @@ export default function Onboarding() {
           </div>
 
           <button
-            onClick={() => canProceed && next('quest')}
+            onClick={() => canProceed && next('shield')}
             className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
             data-testid="button-discipline-next"
             disabled={!canProceed}
@@ -681,6 +690,161 @@ export default function Onboarding() {
             }}
           >
             Forge Your Legend <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── The Shield ─────────────────────────────────────
+  if (step === 'shield') {
+    const hasSelection = shieldSelection.length > 0;
+
+    function toggleCategory(id: string) {
+      setShieldSelection(prev =>
+        prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
+      );
+    }
+
+    function handleSkip() {
+      setShieldEnabled(false);
+      setBlocklist([]);
+      next('quest');
+    }
+
+    function handleRaise() {
+      setShieldEnabled(true);
+      setBlocklist(shieldSelection);
+      next('quest');
+    }
+
+    return (
+      <div style={{ ...containerStyle, justifyContent: 'flex-start', paddingTop: 48, paddingBottom: 48, overflowY: 'auto' }}
+        className="fq-scroll animate-fade-in"
+      >
+        <div className="w-full max-w-[400px]">
+          <button
+            onClick={() => next('discipline')}
+            className="flex items-center gap-1 mb-6 cursor-pointer"
+            style={{ background: 'none', border: 'none', color: 'var(--fq-text-muted)', fontSize: 12 }}
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
+
+          <p
+            className="font-display mb-1"
+            style={{ fontSize: 10, letterSpacing: '0.26em', color: 'var(--fq-teal)', opacity: 0.8, textTransform: 'uppercase' }}
+          >
+            The Shield
+          </p>
+          <h2
+            className="font-display font-semibold mb-2"
+            style={{ fontSize: 22, color: 'var(--fq-text-primary)' }}
+          >
+            What pulls you away?
+          </h2>
+          <p
+            className="font-serif italic mb-6"
+            style={{ fontSize: 15, color: 'var(--fq-text-body)' }}
+          >
+            Choose the places your attention wanders. The Shield will hold them at the edge of the realm while you work.
+          </p>
+
+          <div
+            className="rounded-2xl mb-4"
+            style={{
+              background: 'var(--fq-frost-subtle)',
+              backdropFilter: 'blur(14px)',
+              border: '1px solid var(--fq-border)',
+              boxShadow: 'var(--fq-shadow-card)',
+            }}
+          >
+            <p
+              className="font-display uppercase px-5 pt-5 mb-1"
+              style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-text-muted)' }}
+            >
+              Shielded Paths
+            </p>
+            <p
+              className="font-serif italic px-5 mb-3"
+              style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}
+            >
+              These are the currents that most often steal your focus.
+            </p>
+
+            {SHIELD_CATEGORIES.map(cat => {
+              const on = shieldSelection.includes(cat.id);
+              return (
+                <div
+                  key={cat.id}
+                  className="flex items-center justify-between px-5 py-3"
+                  style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}
+                >
+                  <div className="mr-3">
+                    <p
+                      className="font-display"
+                      style={{ fontSize: 13, color: 'var(--fq-text-primary)', letterSpacing: '0.04em' }}
+                    >
+                      {cat.label}
+                    </p>
+                    <p
+                      className="font-serif italic"
+                      style={{ fontSize: 12, color: 'var(--fq-text-muted)', marginTop: 2 }}
+                    >
+                      {cat.description}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => toggleCategory(cat.id)}
+                    className="relative flex-shrink-0 cursor-pointer transition-all duration-250"
+                    style={{
+                      width: 38,
+                      height: 22,
+                      background: on ? 'rgba(94,196,192,0.2)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${on ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
+                      borderRadius: 11,
+                      outline: 'none',
+                    }}
+                  >
+                    <div
+                      className="absolute rounded-full transition-all duration-250"
+                      style={{
+                        top: 3,
+                        left: on ? 19 : 3,
+                        width: 14,
+                        height: 14,
+                        background: on ? 'var(--fq-teal)' : 'var(--fq-text-muted)',
+                        boxShadow: on ? '0 0 8px rgba(94,196,192,0.5)' : 'none',
+                      }}
+                    />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={handleRaise}
+            className="w-full font-display tracking-[0.14em] uppercase cursor-pointer transition-all duration-200 flex items-center justify-center gap-2"
+            style={{
+              background: 'linear-gradient(135deg, rgba(30,55,70,0.9) 0%, rgba(18,38,50,0.95) 100%)',
+              border: '1.5px solid var(--fq-border-teal)',
+              color: 'var(--fq-teal-bright)',
+              borderRadius: 999,
+              padding: '15px 36px',
+              fontSize: 11,
+              boxShadow: '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            Raise the Shield <ChevronRight size={14} />
+          </button>
+
+          <button
+            onClick={handleSkip}
+            className="mt-4 mx-auto block font-serif italic cursor-pointer"
+            style={{ fontSize: 13, color: 'var(--fq-text-muted)', background: 'none', border: 'none' }}
+          >
+            Skip for now
           </button>
         </div>
       </div>

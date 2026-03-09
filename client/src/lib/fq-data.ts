@@ -45,6 +45,8 @@ export interface AppState {
   userDisciplines: UserDiscipline[];
   sessions: Session[];
   activeSession: ActiveSessionData | null;
+  shieldEnabled: boolean;
+  blocklist: string[];
 }
 
 // ── Discipline Metadata ────────────────────────────
@@ -113,6 +115,8 @@ const DEFAULT_STATE: AppState = {
   userDisciplines: [],
   sessions: [],
   activeSession: null,
+  shieldEnabled: false,
+  blocklist: [],
 };
 
 export function loadState(): AppState {
@@ -129,6 +133,13 @@ export function loadState(): AppState {
     if (parsed.character?.discipline && !parsed.character?.disciplines) {
       parsed.character.disciplines = [parsed.character.discipline];
       delete parsed.character.discipline;
+    }
+    // Ensure new fields exist
+    if (typeof parsed.shieldEnabled !== 'boolean') {
+      parsed.shieldEnabled = false;
+    }
+    if (!Array.isArray(parsed.blocklist)) {
+      parsed.blocklist = [];
     }
     return { ...DEFAULT_STATE, ...parsed };
   } catch {

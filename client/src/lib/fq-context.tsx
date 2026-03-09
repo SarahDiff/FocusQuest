@@ -20,6 +20,9 @@ interface FQContextValue {
   endSession: () => Session | null;
   addSession: (session: Session) => void;
   resetApp: () => void;
+  activateDiscipline: (id: string) => void;
+  setShieldEnabled: (value: boolean) => void;
+  setBlocklist: (items: string[]) => void;
 }
 
 const FQContext = createContext<FQContextValue | null>(null);
@@ -140,6 +143,34 @@ export function FQProvider({ children }: { children: ReactNode }) {
     }));
   }, [setState]);
 
+  const activateDiscipline = useCallback((id: string) => {
+    setState(prev => {
+      const exists = prev.userDisciplines.some(d => d.disciplineId === id);
+      if (exists) return prev;
+      return {
+        ...prev,
+        userDisciplines: [
+          ...prev.userDisciplines,
+          { disciplineId: id as any, totalMinutes: 0 },
+        ],
+      };
+    });
+  }, [setState]);
+
+  const setShieldEnabled = useCallback((value: boolean) => {
+    setState(prev => ({
+      ...prev,
+      shieldEnabled: value,
+    }));
+  }, [setState]);
+
+  const setBlocklist = useCallback((items: string[]) => {
+    setState(prev => ({
+      ...prev,
+      blocklist: items,
+    }));
+  }, [setState]);
+
   const resetApp = useCallback(() => {
     setState(() => ({
       character: null,
@@ -160,6 +191,9 @@ export function FQProvider({ children }: { children: ReactNode }) {
       endSession,
       addSession,
       resetApp,
+      activateDiscipline,
+      setShieldEnabled,
+      setBlocklist,
     }}>
       {children}
     </FQContext.Provider>

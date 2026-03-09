@@ -83,10 +83,10 @@ function ToggleRow({ label, sub, value, onToggle }: {
 }
 
 export default function Profile() {
-  const { state, resetApp } = useFQ();
+  const { state, resetApp, setShieldEnabled } = useFQ();
   const [, navigate] = useLocation();
   const [nudge, setNudge] = useState(false);
-  const [shield, setShield] = useState(true);
+  const [shield, setShield] = useState(state.shieldEnabled);
   const [showReset, setShowReset] = useState(false);
 
   const char = state.character;
@@ -237,7 +237,13 @@ export default function Profile() {
           label="The Shield"
           sub="Holds distracting apps at bay during sessions"
           value={shield}
-          onToggle={() => setShield(v => !v)}
+          onToggle={() => {
+            setShield(prev => {
+              const next = !prev;
+              setShieldEnabled(next);
+              return next;
+            });
+          }}
         />
         <ToggleRow
           label="Daily Nudge"
