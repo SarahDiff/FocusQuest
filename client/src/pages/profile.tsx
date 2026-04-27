@@ -323,14 +323,6 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Ambient quote */}
-      <p
-        className="font-serif italic text-center"
-        style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}
-      >
-        {char.disciplines?.[0] ? DISCIPLINE_META[char.disciplines[0]].tagline : 'Your time. Your legend.'}
-      </p>
-
       {/* Reset Confirmation Modal */}
       {showReset && (
         <div

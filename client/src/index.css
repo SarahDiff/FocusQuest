@@ -96,9 +96,10 @@
   --fq-xp-glow-lg: rgba(212, 168, 75, 0.38);
   --fq-silver: #c8d4e0;
   --fq-moon: #a8c4e8;
-  --fq-text-primary: #e2eaf4;
-  --fq-text-body: #96a8bc;
-  --fq-text-muted: #7a96aa;
+  /* Higher contrast for WCAG-aligned readability on dark UI */
+  --fq-text-primary: #eef3f9;
+  --fq-text-body: #b4c2d4;
+  --fq-text-muted: #a3b8cc;
   --fq-text-ghost: #242e3a;
   --fq-border: rgba(180,210,240,0.10);
   --fq-border-mid: rgba(180,210,240,0.22);
@@ -257,22 +258,55 @@
     inset: -1px;
   }
 
-  /* FocusQuest ember particles */
+  /* FocusQuest ember particles — slow fade in, slow fade out */
   @keyframes ember-rise {
     0% {
       transform: translateY(0) translateX(0) scale(1);
       opacity: 0;
     }
-    12% {
+    25% {
       opacity: 1;
     }
-    80% {
-      opacity: 0.55;
+    70% {
+      opacity: 0.6;
     }
     100% {
       transform: translateY(-68vh) translateX(var(--ember-drift, 18px)) scale(0.25);
       opacity: 0;
     }
+  }
+
+  /* Embers rising from focus ring (session) */
+  @keyframes ember-rise-from-ring {
+    0% {
+      transform: translateY(0) translateX(0) scale(1);
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(var(--ember-rise-y, -120px)) translateX(var(--ember-drift, 0)) scale(0.4);
+      opacity: 0;
+    }
+  }
+
+  /* Focus ring pulsating glow (active session) */
+  @keyframes focus-ring-pulse {
+    0%, 100% {
+      box-shadow: 0 0 24px rgba(212, 168, 75, 0.2), 0 0 48px rgba(212, 168, 75, 0.08);
+      opacity: 0.85;
+    }
+    50% {
+      box-shadow: 0 0 36px rgba(212, 168, 75, 0.35), 0 0 72px rgba(212, 168, 75, 0.15);
+      opacity: 1;
+    }
+  }
+  .fq-focus-ring-pulse {
+    animation: focus-ring-pulse 2.2s ease-in-out infinite;
   }
 
   /* FocusQuest avatar glow (post level-up) */
@@ -350,5 +384,63 @@
   .fq-scroll::-webkit-scrollbar-thumb {
     background: var(--fq-border-mid);
     border-radius: 2px;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ── FocusQuest typography helpers (mobile readability) ───────────── */
+  .fq-label {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--fq-text-muted);
+  }
+  .fq-label-sm {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--fq-text-muted);
+  }
+  .fq-caption {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--fq-text-body);
+  }
+  .fq-body {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--fq-text-body);
+  }
+  /* Skill card tagline: readable body text (not tiny all-caps) */
+  .fq-skill-tagline {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: var(--fq-text-body);
+  }
+  .fq-skill-tagline-compact {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: 0.01em;
+    color: var(--fq-text-body);
+  }
+  .fq-italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--fq-text-body);
   }
 }

@@ -4,28 +4,31 @@ import { Pause, Play, Square, ChevronRight } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
 import { getSkillLevel, getSkillXPProgress, formatTimer, calculateXP, DISCIPLINE_META, type Session } from "@/lib/fq-data";
 import XPBar from "@/components/xp-bar";
+import RingEmbers from "@/components/ring-embers";
 import characterImg from "@assets/ChatGPT_Image_Mar_5,_2026_at_08_15_07_PM_1772738146448.png";
 
-// ── SVG Timer Ring ─────────────────────────────────
+// ── SVG Timer Ring (2x size: 320px) ─────────────────
 
 function TimerRing({ pct }: { pct: number }) {
-  const radius = 70;
+  const radius = 140;
   const circ = 2 * Math.PI * radius;
   const offset = circ - (pct / 100) * circ;
+  const size = 320;
+  const cx = size / 2;
+  const cy = size / 2;
 
   return (
-    <svg width="160" height="160" viewBox="0 0 160 160" style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
-      <circle cx="80" cy="80" r={76} fill="none" stroke="rgba(180,210,240,0.07)" strokeWidth="0.8" strokeDasharray="3 9" />
-      <circle cx="80" cy="80" r={radius} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="3" />
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
+      <circle cx={cx} cy={cy} r={radius} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="5" />
       <circle
-        cx="80" cy="80" r={radius}
+        cx={cx} cy={cy} r={radius}
         fill="none"
         stroke="#d4a84b"
-        strokeWidth="3"
+        strokeWidth="5"
         strokeLinecap="round"
         strokeDasharray={circ}
         strokeDashoffset={offset}
-        style={{ transition: 'stroke-dashoffset 1s linear', filter: 'drop-shadow(0 0 6px rgba(212,168,75,0.55))' }}
+        style={{ transition: 'stroke-dashoffset 1s linear', filter: 'drop-shadow(0 0 12px rgba(212,168,75,0.55))' }}
       />
     </svg>
   );
@@ -112,7 +115,7 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
               <p className="font-display font-medium" style={{ fontSize: 14, color: 'var(--fq-text-primary)', letterSpacing: '0.04em' }}>
                 {disciplineMeta?.label ?? session.skillName}
               </p>
-              <p className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.14em', color: 'var(--fq-text-muted)' }}>
+              <p className="fq-label-sm">
                 Level {newLevel}
               </p>
             </div>
@@ -120,12 +123,12 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
 
           <div className="flex items-stretch gap-4 mb-5">
             <div className="flex-1 text-center">
-              <p className="font-display uppercase mb-1" style={{ fontSize: 7, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}>Duration</p>
+              <p className="fq-label-sm mb-1">Duration</p>
               <p className="font-display font-semibold" style={{ fontSize: 16, color: 'var(--fq-text-body)' }}>{durationStr}</p>
             </div>
             <div style={{ width: 1, background: 'var(--fq-border)' }} />
             <div className="flex-1 text-center">
-              <p className="font-display uppercase mb-1" style={{ fontSize: 7, letterSpacing: '0.18em', color: 'var(--fq-text-muted)' }}>XP Earned</p>
+              <p className="fq-label-sm mb-1">XP Earned</p>
               <p className="font-display font-bold" style={{ fontSize: 22, color: 'var(--fq-xp-bright)', textShadow: '0 0 16px rgba(212,168,75,0.5)' }}>
                 +{session.xpEarned}
               </p>
@@ -142,7 +145,7 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
                 <p className="font-display font-semibold" style={{ fontSize: 12, color: 'var(--fq-xp-bright)', letterSpacing: '0.06em' }}>
                   Level Up — {disciplineMeta?.label}
                 </p>
-                <p className="font-serif italic" style={{ fontSize: 12, color: 'var(--fq-text-muted)' }}>
+                <p className="fq-italic">
                   Reached Level {newLevel}
                 </p>
               </div>
@@ -151,8 +154,8 @@ function CompleteScreen({ session, prevLevel, newLevel, onReturn }: {
 
           <div>
             <div className="flex justify-between items-baseline mb-1.5">
-              <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.14em', color: 'var(--fq-text-muted)' }}>Progress to Level {newLevel + 1}</span>
-              <span className="font-display" style={{ fontSize: 9, color: 'var(--fq-xp-bright)' }}>{Math.round(getSkillXPProgress(newLevel * 60 - 30).pct)}%</span>
+              <span className="fq-label-sm">Progress to Level {newLevel + 1}</span>
+              <span className="font-display" style={{ fontSize: 12, color: 'var(--fq-xp-bright)' }}>{Math.round(getSkillXPProgress(newLevel * 60 - 30).pct)}%</span>
             </div>
             <XPBar pct={getSkillXPProgress(newLevel * 60 - 30).pct} height={5} />
           </div>
@@ -255,6 +258,20 @@ export default function Session() {
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#090c10' }}>
       <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden',
+          zIndex: 0,
+          opacity: isPaused ? 0 : 1,
+          transition: 'opacity 1.8s ease-out',
+        }}
+      >
+        <RingEmbers />
+      </div>
+      <div
         className="absolute pointer-events-none"
         style={{ top: '30%', left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(212,168,75,0.08) 0%, transparent 70%)' }}
       />
@@ -263,7 +280,8 @@ export default function Session() {
         style={{ bottom: 0, left: '20%', width: 200, height: 200, background: 'radial-gradient(circle, rgba(94,196,192,0.05) 0%, transparent 70%)' }}
       />
 
-      <div className="flex justify-center pt-14 pb-4">
+      <div className="relative z-10 flex flex-col flex-1 min-h-0">
+      <div className="flex justify-center pt-14 pb-4 shrink-0">
         <div
           className="inline-flex items-center gap-2 font-display uppercase"
           style={{
@@ -281,15 +299,27 @@ export default function Session() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="relative flex items-center justify-center mb-3" style={{ width: 200, height: 200 }}>
-          <div style={{ position: 'absolute', inset: 20 }}>
+      <div className="flex-1 flex flex-col items-center justify-center min-h-0">
+        <div className="relative flex items-center justify-center mb-3" style={{ width: 400, height: 400 }}>
+          <div style={{ position: 'absolute', inset: 0, width: 320, height: 320, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+            {!isPaused && (
+              <div
+                className="fq-focus-ring-pulse"
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '50%',
+                  pointerEvents: 'none',
+                }}
+              />
+            )}
             <TimerRing pct={ringPct} />
           </div>
           <div className="relative z-10 flex flex-col items-center">
             <span
               className="font-display font-bold"
-              style={{ fontSize: 42, color: isPaused ? 'var(--fq-text-muted)' : 'var(--fq-text-primary)', letterSpacing: '0.04em', lineHeight: 1, transition: 'color 0.3s' }}
+              style={{ fontSize: 48, color: isPaused ? 'var(--fq-text-muted)' : 'var(--fq-text-primary)', letterSpacing: '0.04em', lineHeight: 1, transition: 'color 0.3s' }}
               data-testid="timer-display"
             >
               {formatTimer(elapsed)}
@@ -332,7 +362,7 @@ export default function Session() {
         </p>
       </div>
 
-      <div className="px-6 pb-10 pt-4" style={{ borderTop: '1px solid var(--fq-border)' }}>
+      <div className="px-6 pb-10 pt-4 mt-auto" style={{ borderTop: '1px solid var(--fq-border)' }}>
         <div className="flex items-center gap-4">
           <button
             onClick={handlePauseResume}
@@ -369,6 +399,7 @@ export default function Session() {
             End
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

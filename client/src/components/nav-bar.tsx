@@ -18,13 +18,7 @@ export default function NavBar() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50"
-      style={{
-        maxWidth: '430px',
-        margin: '0 auto',
-        left: '50%',
-        transform: 'translateX(-50%)',
-      }}
+      className="fixed bottom-0 left-0 right-0 z-50 w-full"
       data-testid="nav-bar"
     >
       <div
@@ -43,7 +37,8 @@ export default function NavBar() {
               <button
                 key={path}
                 onClick={() => navigate(path)}
-                className="flex-1 flex flex-col items-center gap-1 py-3 transition-all duration-200 cursor-pointer"
+                aria-label={label}
+                className="flex-1 flex flex-col items-center justify-center py-3 transition-all duration-200 cursor-pointer"
                 data-testid={`nav-${label.toLowerCase()}`}
                 style={{
                   background: 'none',
@@ -54,17 +49,11 @@ export default function NavBar() {
                 <Icon
                   size={20}
                   style={{
-                    color: active ? 'var(--fq-teal)' : 'var(--fq-text-muted)',
-                    filter: active ? 'drop-shadow(0 0 6px rgba(94,196,192,0.6))' : 'none',
+                    color: active ? 'var(--fq-xp-bright)' : 'var(--fq-xp)',
+                    filter: active ? 'drop-shadow(0 0 6px rgba(212,168,75,0.6))' : 'none',
                     transition: 'all 0.2s',
                   }}
                 />
-                <span
-                  className="font-display text-[8px] tracking-widest uppercase transition-all duration-200"
-                  style={{ color: active ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}
-                >
-                  {label}
-                </span>
               </button>
             );
           })}

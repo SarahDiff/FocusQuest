@@ -126,6 +126,45 @@ function Heatmap() {
   );
 }
 
+function WeekRow() {
+  const { state } = useFQ();
+  const days = [];
+  const today = new Date();
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toDateString();
+    const hasSessions = state.sessions.some(s => new Date(s.date).toDateString() === dateStr);
+    const isToday = i === 0;
+    days.push({ d, hasSessions, isToday, label: d.toLocaleDateString('en', { weekday: 'narrow' }) });
+  }
+
+  return (
+    <div className="flex items-center justify-between">
+      {days.map(({ hasSessions, isToday, label }, i) => (
+        <div key={i} className="flex flex-col items-center gap-2">
+          <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.1em', color: isToday ? 'var(--fq-teal)' : 'var(--fq-text-muted)' }}>
+            {label}
+          </span>
+          <div
+            className="rounded-full"
+            style={{
+              width: 28, height: 28,
+              background: hasSessions ? 'rgba(94,196,192,0.15)' : 'rgba(255,255,255,0.03)',
+              border: isToday ? '1.5px solid var(--fq-teal)' : hasSessions ? '1px solid rgba(94,196,192,0.3)' : '1px solid var(--fq-border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: isToday ? '0 0 8px rgba(94,196,192,0.3)' : 'none',
+            }}
+          >
+            {hasSessions && <div className="rounded-full" style={{ width: 6, height: 6, background: 'var(--fq-teal)' }} />}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function History() {
   const { state } = useFQ();
   const sessions = state.sessions;
@@ -139,6 +178,16 @@ export default function History() {
         <h1 className="font-display font-bold" style={{ fontSize: 24, color: 'var(--fq-text-primary)', letterSpacing: '0.02em' }}>
           History
         </h1>
+      </div>
+
+      <div
+        className="rounded-2xl p-5 mb-6 animate-fade-in"
+        style={{ background: 'var(--fq-frost-subtle)', backdropFilter: 'blur(14px)', border: '1px solid var(--fq-border)', boxShadow: 'var(--fq-shadow-card)' }}
+      >
+        <p className="font-display uppercase mb-4" style={{ fontSize: 9, letterSpacing: '0.26em', color: 'var(--fq-text-muted)' }}>
+          This Week
+        </p>
+        <WeekRow />
       </div>
 
       <StatsRow />

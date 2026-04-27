@@ -2,10 +2,23 @@
 //  FocusQuest — Core Data Layer
 // ══════════════════════════════════════════════════
 
+import { SHIELD_APPS, SHIELD_LEGACY_CATEGORY_APPS } from "./shield-apps";
+
 export type Bearing = 'male' | 'neutral' | 'female';
 export type Discipline =
-  | 'scholar' | 'warrior' | 'scribe' | 'adventurer'
-  | 'ranger' | 'alchemist' | 'bard' | 'monk';
+  | 'warrior'
+  | 'scholar'
+  | 'charm'
+  | 'bard'
+  | 'steward'
+  | 'ranger'
+  | 'adventurer'
+  | 'monk'
+  | 'architect'
+  | 'alchemist'
+  | 'artisan'
+  | 'scribe'
+  | 'lore';
 
 export interface Character {
   name: string;
@@ -55,17 +68,115 @@ export interface AppState {
 // ── Discipline Metadata ────────────────────────────
 
 export const DISCIPLINE_META: Record<Discipline, { label: string; tagline: string; description: string; glyph: string }> = {
-  scholar:    { label: 'Scholar',    tagline: 'Seeker of wisdom',      description: 'You pursue knowledge with quiet dedication. Books, study, and contemplation are your weapons.',       glyph: '✦'  },
-  warrior:    { label: 'Warrior',    tagline: 'Forged by effort',      description: 'Discipline of body is discipline of mind. You find truth through movement and endurance.',             glyph: '⚔'  },
-  scribe:     { label: 'Scribe',     tagline: 'Weaver of worlds',      description: 'You give form to ideas others cannot yet name. The page is your realm.',                               glyph: '✒'  },
-  adventurer: { label: 'Adventurer', tagline: 'Beyond the horizon',    description: 'Every journey changes you. You seek growth through exploration and discovery.',                         glyph: '◎'  },
-  ranger:     { label: 'Ranger',     tagline: 'Trail & instinct',      description: 'Reading the land, moving with purpose. The wild is your domain and truest teacher.',                   glyph: '⬟'  },
-  alchemist:  { label: 'Alchemist',  tagline: 'Transmute & create',    description: 'Turning experiment into mastery. You find wisdom in the laboratory of life.',                          glyph: '⬡'  },
-  bard:       { label: 'Bard',       tagline: 'Voice & vision',        description: 'Weaving creativity into every endeavour. Art, music, and story are your craft.',                       glyph: '♬'  },
-  monk:       { label: 'Monk',       tagline: 'Still & transcendent',  description: 'In stillness, the sharpest clarity is found. Body and spirit move as one.',                           glyph: '◇'  },
+  warrior: {
+    label: 'Warrior',
+    tagline: 'Strength & motion — exercise, sport, training',
+    description:
+      'Use this path when you are moving your body on purpose: gym sessions, runs, sports, stretching, or anything that builds strength and stamina.',
+    glyph: '⚔',
+  },
+  scholar: {
+    label: 'Scholar',
+    tagline: 'Wisdom seeking — study, courses, deep learning',
+    description:
+      'Use this path when you are learning with intent: classes, reading to understand, flashcards, languages, certifications, or focused skill practice.',
+    glyph: '✦',
+  },
+  charm: {
+    label: 'Charm',
+    tagline: 'Hearts & company — social time, friends, community',
+    description:
+      'Use this path when you are investing in people: conversations, gatherings, networking, family time, or anything that nourishes connection.',
+    glyph: '❖',
+  },
+  bard: {
+    label: 'Bard',
+    tagline: 'Song & sound — music practice, performance, listening',
+    description:
+      'Use this path when music is the work: instrument practice, voice work, composing, rehearsals, ear training, or deep listening as your focus.',
+    glyph: '♪',
+  },
+  steward: {
+    label: 'Steward',
+    tagline: 'Hearth & order — cleaning, tidying, upkeep',
+    description:
+      'Use this path when you are caring for space: laundry, dishes, decluttering, organizing, maintenance, or turning chaos back into calm.',
+    glyph: '⌂',
+  },
+  ranger: {
+    label: 'Guardian',
+    tagline: 'Care & keeping — caretaking for people and creatures',
+    description:
+      'Use this path when someone else is the focus: children, elders, partners, pets, caregiving tasks, or steady support for those who rely on you.',
+    glyph: '⬟',
+  },
+  adventurer: {
+    label: 'Adventure',
+    tagline: 'Wilds & wander — outdoors, hiking, nature sport',
+    description:
+      'Use this path when you are outside and moving: trails, parks, climbing, cycling in nature, camping prep—anything that belongs under open sky.',
+    glyph: '◎',
+  },
+  monk: {
+    label: 'Monk',
+    tagline: 'Breath & stillness — meditation, mindfulness',
+    description:
+      'Use this path when you are settling the mind and body: seated practice, breathwork, contemplation, gentle yoga meant as inner work, not exercise.',
+    glyph: '◇',
+  },
+  architect: {
+    label: 'Architect',
+    tagline: 'Plans & depth — focused work and big projects',
+    description:
+      'Use this path for professional or serious projects: deep work blocks, building products, strategy, writing reports, or anything that needs sustained attention.',
+    glyph: '⛶',
+  },
+  alchemist: {
+    label: 'Alchemy',
+    tagline: 'Fire & feasting — cooking and kitchen craft',
+    description:
+      'Use this path when the kitchen is your quest: meal prep, baking, recipe experiments, batch cooking—anything where food is the main focus.',
+    glyph: '⬡',
+  },
+  artisan: {
+    label: 'Artisan',
+    tagline: 'Hand & eye — art, craft, design, making',
+    description:
+      'Use this path when you are making something tangible or visual: drawing, painting, sculpture, pottery, digital art, photography, or detailed craft.',
+    glyph: '✶',
+  },
+  scribe: {
+    label: 'Scribe',
+    tagline: 'Pages & voice — journaling and creative writing',
+    description:
+      'Use this path when words are the craft: morning pages, fiction, poetry, scripting, blogging for yourself—writing that is not mainly “studying.”',
+    glyph: '✒',
+  },
+  lore: {
+    label: 'Lore',
+    tagline: 'Tales & tomes — reading for pleasure',
+    description:
+      'Use this path when you read for joy or immersion: novels, comics, long-form articles for fun—distinct from study or work reading.',
+    glyph: '☾',
+  },
 };
 
-export const ALL_DISCIPLINES = Object.keys(DISCIPLINE_META) as Discipline[];
+// Display order: table paths + Bard (music) after Charm
+export const ALL_DISCIPLINES: Discipline[] = [
+  'warrior',
+  'scholar',
+  'charm',
+  'bard',
+  'steward',
+  'ranger',
+  'adventurer',
+  'monk',
+  'architect',
+  'alchemist',
+  'artisan',
+  'scribe',
+  'lore',
+];
 
 // ── Leveling ──────────────────────────────────────
 
@@ -146,6 +257,8 @@ export function loadState(): AppState {
     }
     if (!Array.isArray(parsed.blocklist)) {
       parsed.blocklist = [];
+    } else {
+      parsed.blocklist = migrateShieldBlocklist(parsed.blocklist as string[]);
     }
     if (typeof parsed.nudgeEnabled !== 'boolean') {
       parsed.nudgeEnabled = false;
@@ -156,6 +269,8 @@ export function loadState(): AppState {
     if (typeof parsed.pendingAvatarUpgrade !== 'boolean') {
       parsed.pendingAvatarUpgrade = false;
     }
+    // Migration: socializing path was stored as id "bard" → now "charm"; "bard" is music
+    migrateLegacyBardToCharm(parsed);
     return { ...DEFAULT_STATE, ...parsed };
   } catch {
     return { ...DEFAULT_STATE };
@@ -172,6 +287,49 @@ export function saveState(state: AppState): void {
 
 export function clearState(): void {
   localStorage.removeItem(STORAGE_KEY);
+}
+
+const KNOWN_SHIELD_APP_IDS = new Set(SHIELD_APPS.map(a => a.id));
+
+/** Expand legacy category ids (social, video, …) into per-app shield ids; drop removed app ids. */
+function migrateShieldBlocklist(ids: string[]): string[] {
+  const next: string[] = [];
+  for (const id of ids) {
+    const legacy = SHIELD_LEGACY_CATEGORY_APPS[id];
+    if (legacy) next.push(...legacy);
+    else next.push(id);
+  }
+  return Array.from(new Set(next)).filter(id => KNOWN_SHIELD_APP_IDS.has(id));
+}
+
+/** Old saves used disciplineId/skillId "bard" for socializing (now "charm"). */
+function migrateLegacyBardToCharm(parsed: Record<string, unknown>): void {
+  if (Array.isArray(parsed.userDisciplines)) {
+    parsed.userDisciplines = (parsed.userDisciplines as UserDiscipline[]).map(ud =>
+      ud.disciplineId === 'bard' ? { ...ud, disciplineId: 'charm' as Discipline } : ud,
+    );
+  }
+
+  if (Array.isArray(parsed.sessions)) {
+    parsed.sessions = (parsed.sessions as Session[]).map(s =>
+      s.skillId === 'bard'
+        ? { ...s, skillId: 'charm', skillName: 'Charm' }
+        : s,
+    );
+  }
+
+  const as = parsed.activeSession as ActiveSessionData | null | undefined;
+  if (as && as.skillId === 'bard') {
+    parsed.activeSession = { ...as, skillId: 'charm' };
+  }
+
+  const char = parsed.character as Character | null | undefined;
+  if (char?.disciplines?.length) {
+    parsed.character = {
+      ...char,
+      disciplines: char.disciplines.map(d => (d === 'bard' ? 'charm' : d)),
+    };
+  }
 }
 
 // ── Session XP ────────────────────────────────────

@@ -3,7 +3,9 @@ import { useLocation } from "wouter";
 import { ChevronRight, ChevronLeft, ChevronDown, User } from "lucide-react";
 import { useFQ } from "@/lib/fq-context";
 import { type Bearing, type Discipline, DISCIPLINE_META, ALL_DISCIPLINES } from "@/lib/fq-data";
-import characterImg from "@assets/ChatGPT_Image_Mar_5,_2026_at_08_15_07_PM_1772738146448.png";
+import { SHIELD_APPS } from "@/lib/shield-apps";
+import ShieldGlassAppTile from "@/components/shield-glass-app-tile";
+import questAvatar from "@assets/quest-avatar.png";
 
 type Step = 'splash' | 'philosophy' | 'identity' | 'avatar' | 'discipline' | 'shield' | 'quest';
 
@@ -23,15 +25,6 @@ const HAIR_OPTIONS = ['Raven Black', 'Tawny Brown', 'Amber Gold', 'Auburn Red', 
 const HAIR_LENGTH_OPTIONS = ['Cropped', 'Short', 'Shoulder', 'Long Straight', 'Long Wavy', 'Curly Short', 'Curly Long'];
 const SKIN_OPTIONS = ['Alabaster', 'Pale Rose', 'Sun-Kissed', 'Bronze', 'Copper', 'Ebony'];
 const EYE_COLOR_OPTIONS = ['Storm Grey', 'Forest Green', 'Ocean Blue', 'Amber', 'Onyx', 'Violet'];
-
-const SHIELD_CATEGORIES: { id: string; label: string; description: string }[] = [
-  { id: 'social', label: 'Social', description: 'Instagram, TikTok, X' },
-  { id: 'video', label: 'Video', description: 'YouTube, Netflix' },
-  { id: 'games', label: 'Games', description: 'Games and play' },
-  { id: 'shopping', label: 'Shopping', description: 'Shops and marketplaces' },
-  { id: 'news', label: 'News', description: 'Headlines and feeds' },
-];
-
 
 function SectionDivider({ label }: { label: string }) {
   return (
@@ -388,7 +381,7 @@ export default function Onboarding() {
         {/* Character portrait */}
         <div className="relative flex-shrink-0" style={{ height: 440 }}>
           <img
-            src={characterImg}
+            src={questAvatar}
             alt="Your Traveller"
             style={{
               width: '100%',
@@ -485,8 +478,8 @@ export default function Onboarding() {
                     {b.glyph}
                   </span>
                   <span
-                    className="font-display uppercase"
-                    style={{ fontSize: 8, letterSpacing: '0.12em', color: selected ? 'var(--fq-xp-bright)' : 'var(--fq-text-muted)' }}
+                    className="fq-label-sm"
+                    style={{ color: selected ? 'var(--fq-xp-bright)' : 'var(--fq-text-muted)' }}
                   >
                     {b.label}
                   </span>
@@ -498,7 +491,7 @@ export default function Onboarding() {
           {/* OR divider */}
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
-            <span className="font-display uppercase" style={{ fontSize: 8, letterSpacing: '0.22em', color: 'var(--fq-text-muted)' }}>or</span>
+            <span className="fq-label-sm">or</span>
             <div className="flex-1 h-px" style={{ background: 'var(--fq-border)' }} />
           </div>
 
@@ -602,16 +595,16 @@ export default function Onboarding() {
             className="font-display font-semibold mb-1"
             style={{ fontSize: 22, color: 'var(--fq-text-primary)' }}
           >
-            Choose Your Disciplines
+            Choose Your Paths
           </h2>
           <div className="flex items-center justify-between mb-6">
-            <p className="font-serif italic" style={{ fontSize: 14, color: 'var(--fq-text-muted)' }}>
+            <p className="font-serif italic" style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--fq-text-body)' }}>
               Pick up to three to begin with.
             </p>
             <span
               className="font-display uppercase"
               style={{
-                fontSize: 9, letterSpacing: '0.14em',
+                fontSize: 11, letterSpacing: '0.12em',
                 color: atMax ? 'var(--fq-xp)' : 'var(--fq-text-muted)',
                 background: atMax ? 'rgba(212,168,75,0.1)' : 'transparent',
                 border: `1px solid ${atMax ? 'rgba(212,168,75,0.3)' : 'transparent'}`,
@@ -654,14 +647,14 @@ export default function Onboarding() {
                     {meta.glyph}
                   </div>
                   <div
-                    className="font-display font-semibold mb-0.5"
-                    style={{ fontSize: 12, color: selected ? 'var(--fq-text-primary)' : 'var(--fq-text-body)', letterSpacing: '0.04em' }}
+                    className="font-display font-semibold mb-1"
+                    style={{ fontSize: 14, color: selected ? 'var(--fq-text-primary)' : 'var(--fq-text-body)', letterSpacing: '0.03em' }}
                   >
                     {meta.label}
                   </div>
                   <div
-                    className="font-display uppercase"
-                    style={{ fontSize: 7, letterSpacing: '0.12em', color: selected ? 'var(--fq-teal)' : 'var(--fq-text-muted)', opacity: 0.85 }}
+                    className="fq-skill-tagline-compact line-clamp-3"
+                    style={{ color: selected ? 'var(--fq-text-body)' : 'var(--fq-text-muted)' }}
                   >
                     {meta.tagline}
                   </div>
@@ -683,7 +676,7 @@ export default function Onboarding() {
               color: canProceed ? 'var(--fq-teal-bright)' : 'var(--fq-text-muted)',
               borderRadius: 999,
               padding: '15px 36px',
-              fontSize: 11,
+              fontSize: 13,
               boxShadow: canProceed ? '0 0 20px rgba(94,196,192,0.18), 0 4px 20px rgba(0,0,0,0.5)' : 'none',
               opacity: canProceed ? 1 : 0.5,
               cursor: canProceed ? 'pointer' : 'not-allowed',
@@ -698,25 +691,23 @@ export default function Onboarding() {
 
   // ── The Shield ─────────────────────────────────────
   if (step === 'shield') {
-    const hasSelection = shieldSelection.length > 0;
-
-    function toggleCategory(id: string) {
+    const toggleShieldApp = (id: string) => {
       setShieldSelection(prev =>
         prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
       );
-    }
+    };
 
-    function handleSkip() {
+    const handleSkip = () => {
       setShieldEnabled(false);
       setBlocklist([]);
       next('quest');
-    }
+    };
 
-    function handleRaise() {
+    const handleRaise = () => {
       setShieldEnabled(true);
       setBlocklist(shieldSelection);
       next('quest');
-    }
+    };
 
     return (
       <div style={{ ...containerStyle, justifyContent: 'flex-start', paddingTop: 48, paddingBottom: 48, overflowY: 'auto' }}
@@ -766,61 +757,26 @@ export default function Onboarding() {
               Shielded Paths
             </p>
             <p
-              className="font-serif italic px-5 mb-3"
+              className="font-serif italic px-5 mb-4"
               style={{ fontSize: 13, color: 'var(--fq-text-muted)' }}
             >
-              These are the currents that most often steal your focus.
+              Tap each path that often steals your focus.
             </p>
 
-            {SHIELD_CATEGORIES.map(cat => {
-              const on = shieldSelection.includes(cat.id);
-              return (
-                <div
-                  key={cat.id}
-                  className="flex items-center justify-between px-5 py-3"
-                  style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}
-                >
-                  <div className="mr-3">
-                    <p
-                      className="font-display"
-                      style={{ fontSize: 13, color: 'var(--fq-text-primary)', letterSpacing: '0.04em' }}
-                    >
-                      {cat.label}
-                    </p>
-                    <p
-                      className="font-serif italic"
-                      style={{ fontSize: 12, color: 'var(--fq-text-muted)', marginTop: 2 }}
-                    >
-                      {cat.description}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => toggleCategory(cat.id)}
-                    className="relative flex-shrink-0 cursor-pointer transition-all duration-250"
-                    style={{
-                      width: 38,
-                      height: 22,
-                      background: on ? 'rgba(94,196,192,0.2)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${on ? 'var(--fq-border-teal)' : 'var(--fq-border)'}`,
-                      borderRadius: 11,
-                      outline: 'none',
-                    }}
-                  >
-                    <div
-                      className="absolute rounded-full transition-all duration-250"
-                      style={{
-                        top: 3,
-                        left: on ? 19 : 3,
-                        width: 14,
-                        height: 14,
-                        background: on ? 'var(--fq-teal)' : 'var(--fq-text-muted)',
-                        boxShadow: on ? '0 0 8px rgba(94,196,192,0.5)' : 'none',
-                      }}
-                    />
-                  </button>
-                </div>
-              );
-            })}
+            <div className="grid grid-cols-3 gap-3 px-5 pb-5">
+              {SHIELD_APPS.map(app => (
+                <ShieldGlassAppTile
+                  key={app.id}
+                  label={app.label}
+                  Icon={app.Icon}
+                  glyph={app.glyph}
+                  gradient={app.gradient}
+                  iconDark={app.iconDark}
+                  selected={shieldSelection.includes(app.id)}
+                  onToggle={() => toggleShieldApp(app.id)}
+                />
+              ))}
+            </div>
           </div>
 
           <button
@@ -858,21 +814,6 @@ export default function Onboarding() {
     return (
       <div style={containerStyle}>
         <div className="w-full max-w-[360px] text-center animate-scale-in">
-          {/* Sigil */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="relative" style={{ width: 100, height: 100 }}>
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{ border: '1px dashed rgba(212,168,75,0.3)', animation: 'spin-slow 10s linear infinite' }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display font-bold text-4xl" style={{ color: 'var(--fq-xp)', textShadow: '0 0 24px rgba(212,168,75,0.5)' }}>
-                  ✦
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Character summary card */}
           <div
             className="rounded-2xl mb-8 p-6 relative overflow-hidden"
@@ -887,6 +828,28 @@ export default function Onboarding() {
               className="absolute top-0 left-0 right-0"
               style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(94,196,192,0.4) 50%, transparent)' }}
             />
+
+            {/* Avatar portrait above name */}
+            <div
+              className="rounded-2xl overflow-hidden mb-4"
+              style={{
+                height: 180,
+                background: 'radial-gradient(circle at 20% 0%, rgba(94,196,192,0.22) 0%, transparent 55%)',
+                border: '1px solid var(--fq-border)',
+              }}
+            >
+              <img
+                src={questAvatar}
+                alt="Your Traveller"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center 15%',
+                  display: 'block',
+                }}
+              />
+            </div>
 
             <div
               className="font-display mb-1"

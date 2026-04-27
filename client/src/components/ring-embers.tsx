@@ -1,12 +1,14 @@
-import { createPortal } from "react-dom";
-
-const EMBERS = Array.from({ length: 22 }, (_, i) => {
+/**
+ * Full-page golden embers during an active focus session.
+ * Same style as onboarding (ember-particles.tsx) but only on session page.
+ */
+const RING_EMBERS = Array.from({ length: 24 }, (_, i) => {
   const seed = i * 137.508;
   const rand = (min: number, max: number, offset = 0) =>
     min + ((Math.sin(seed + offset) * 0.5 + 0.5) * (max - min));
   return {
     id: i,
-    left: rand(2, 98, 0),
+    left: rand(1, 99, 0),
     size: rand(1.5, 3.6, 1),
     duration: rand(4.2, 8.5, 2),
     delay: rand(-8, 0, 3),
@@ -16,24 +18,19 @@ const EMBERS = Array.from({ length: 22 }, (_, i) => {
   };
 });
 
-export default function EmberParticles() {
-  const content = (
+export default function RingEmbers() {
+  return (
     <div
       aria-hidden="true"
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
+        inset: 0,
         pointerEvents: 'none',
         overflow: 'hidden',
-        zIndex: 6,
+        zIndex: 0,
       }}
     >
-      {EMBERS.map(p => (
+      {RING_EMBERS.map((p) => (
         <div
           key={p.id}
           style={{
@@ -47,15 +44,10 @@ export default function EmberParticles() {
             filter: p.blur ? `blur(${p.blur}px)` : undefined,
             boxShadow: `0 0 ${p.size * 2.5}px ${p.color}, 0 0 ${p.size}px rgba(255,200,80,0.6)`,
             animation: `ember-rise ${p.duration}s ease-out ${p.delay}s infinite`,
-            '--ember-drift': `${p.drift}px`,
-          } as React.CSSProperties}
+            ['--ember-drift' as string]: `${p.drift}px`,
+          }}
         />
       ))}
     </div>
   );
-
-  if (typeof document !== 'undefined' && document.body) {
-    return createPortal(content, document.body);
-  }
-  return content;
 }
